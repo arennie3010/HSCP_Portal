@@ -1,0 +1,58 @@
+---
+title: "Emergency Admission Mapping - Management Information Only"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: row
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+knitr::opts_chunk$set(echo = TRUE)
+
+source("/conf/linkage/output/eleanb01/projects/UC_maps/scripts/4_RAPID_Admissions_IZ_MakeMap.R")
+```
+
+
+Map Percentage Change
+=====================================  
+
+Row {data-height=50}
+-------------------------------------
+The map below aims to illustrate differences in Emergency Admissions in Scotland, broken down by Intermediate Zone (IZ). It shows the percentage change in admissions per 1,000 population between the time period 1st March to 31st May in 2019 and the same period in 2020. IZs shaded yellow to red have lower admissions in 2020 compared to 2019, IZs shaded lighter to darker blue have higher admissions in 2020 compared to 2019. Green markers represent hospitals with Emergency Departments. 
+
+Row {data-height=30}
+-------------------------------------
+<i> Explore the map using your mouse. Use the zoom buttons in the top left corner or your mouse wheel to zoom in and out. Click on an area to view high level information concerning, numbers of emergency admissions per 1000 people in 2019 and 2020, and the percentage change between these two years. </i>
+
+Row {data-height=500}
+-------------------------------------
+### Percentage Change in Emergency Admission between March-May 2019 and March-May 2020
+```{r echo = F}
+map.change
+
+```
+
+Row {data-height=20}
+-------------------------------------
+<font size = 2> Data Source: RAPID. Boundaries - Intermediate Zone 2011 - simplified with a 100m tolerance (detail of coastline, lochs and other boundaries has been smoothed out to reduce file size), derived from original file copyright Scottish Government, contains Ordnance Survey data © Crown copyright and database right 2020. </font>
+
+
+Data Table
+=====================================  
+
+```{r echo = F}
+div(DT_table, style = css(height = "90%", padding_bottom = "15px"))
+```
+
+
+Notes
+=====================================  
+
+**Source**: RAPID
+
+**Date Extracted**: 30-Jun-20 (for data 01 March to 31 May 2020) and 26-May-20 (for data 01 March to 31 May 2020)
+
++ Inpatient emergency admissions only - excludes Day cases
++ System Watch specialties (Surgical, Medical, Paediatrics) included only 
++ An admission is a continuous inpatient stay within a single hospital, a stay may have one or more episodes, and may include one or more specialties - the first specialty only is included in stay data
++ Hospitals shown with markers are larger inpatient hospitals with Emergency Departments (A&E). Emergency admissions data also includes a number of admissions to smaller community hospitals.
