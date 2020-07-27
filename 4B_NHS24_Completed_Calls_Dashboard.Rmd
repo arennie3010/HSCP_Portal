@@ -1,0 +1,56 @@
+---
+title: "NHS24 Completed Calls Mapping - Management Information Only"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: row
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+knitr::opts_chunk$set(echo = TRUE)
+
+source("/conf/linkage/output/eleanb01/projects/UC_maps/scripts/nhs24_sas/3B_NHS24_IZ_MakeMap.R")
+```
+
+
+Map Percentage Change
+=====================================  
+
+Row {data-height=50}
+-------------------------------------
+The map below aims to illustrate differences in Completed Calls to NHS24 in Scotland, broken down by Intermediate Zone (IZ). It shows the percentage change in calls per 1,000 population between the time period 1st March to 31st May in 2019 and the same period in 2020. IZs shaded yellow to red have lower calls in 2020 compared to 2019, IZs shaded lighter to darker blue to very dark purple have higher calls in 2020 compared to 2019. Green markers represent hospitals with Emergency Departments. 
+
+Row {data-height=30}
+-------------------------------------
+<i> Explore the map using your mouse. Use the zoom buttons in the top left corner or your mouse wheel to zoom in and out. Click on an area to view high level information concerning, numbers of NHS24 completed calls per 1000 people in 2019 and 2020, and the percentage change between these two years. </i>
+
+Row {data-height=500}
+-------------------------------------
+### Percentage Change in NHS24 Completed Calls between March-May 2019 and March-May 2020
+```{r echo = F}
+map.change
+
+```
+
+Row {data-height=20}
+-------------------------------------
+<font size = 2> Data Source: RAPID. Boundaries - Intermediate Zone 2011 - simplified with a 100m tolerance (detail of coastline, lochs and other boundaries has been smoothed out to reduce file size), derived from original file copyright Scottish Government, contains Ordnance Survey data © Crown copyright and database right 2020. </font>
+
+
+Data Table
+=====================================  
+
+```{r echo = F}
+div(DT_table, style = css(height = "90%", padding_bottom = "15px"))
+```
+
+
+Notes
+=====================================  
+
+**Source**: Unscheduled Care Database
+
+**Date Extracted**: 21 July 2020
+
++ NHS 24 completed calls are calls to NHS24 from a specific postcode area within an Intermediate Zone
++ Hospitals shown with markers are larger inpatient hospitals with Emergency Departments (A&E).
