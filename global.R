@@ -22,6 +22,10 @@ library(xlsx)
 ###############################################.  
 
 ###############################################.
+## Palettes ----
+###############################################.   
+
+###############################################.
 ## Data ----
 
 
@@ -30,6 +34,8 @@ library(xlsx)
 ##### Date limits #####
 start_date <- as.Date("01-03-2020", format = "%d-%m-%Y")
 end_date <- as.Date("30-06-2020", format = "%d-%m-%Y")
+
+
 
 ##### Location lookup #####
 # read in postcode directory file to establish lat & long of patients 
@@ -41,7 +47,7 @@ postcode_lookup <- read.csv('/conf/linkage/output/lookups/Unicode/Geography/Scot
   rename(hb_res = "hb2019")
 postcode_lookup$pat_postcode <- gsub(" ", "", postcode_lookup$pat_postcode)
 
-
+##### END OF LOCATION LOOKUP #####
 
 ##### NHS24 data extract 1 #####
 d1 <- read_xlsx('//conf/LIST_analytics/Glasgow City/COVID19/UC/02-data/extracts/NHS24extract.xlsx',
@@ -79,8 +85,8 @@ nhs24 <- d1 %>%
   pivot_wider(names_from = hb, values_from =count) %>%
   mutate(date = as.Date(as.character(date), format = "%Y-%m-%d")) %>%
   data.frame()
-nhs24$count[is.na(nhs24$count)] = 0
-nhs24$date <- as_date(nhs24$date) 
+#nhs24$count[is.na(nhs24$count)] = 0
+#nhs24$date <- as_date(nhs24$date) 
 
 write.csv(nhs24, file=gzfile("data/nhs24.csv.gz", compression = 9), row.names = FALSE)
 
@@ -89,8 +95,6 @@ write.csv(nhs24, file=gzfile("data/nhs24.csv.gz", compression = 9), row.names = 
 
 ###############################################.    
 
-###############################################.
-## Palettes ----
-###############################################.   
+
 
 ## END

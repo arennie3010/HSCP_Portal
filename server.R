@@ -2,7 +2,7 @@
 # This is the server script, it produces the outputs and reactive objects
 # of the app: charts, text,
 
-source(paste0("global.R"))
+nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
 
 function(input, output, session) {
   
