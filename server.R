@@ -2,6 +2,8 @@
 # This is the server script, it produces the outputs and reactive objects
 # of the app: charts, text,
 
+source(paste0("global.R"))
+
 function(input, output, session) {
   
 }
