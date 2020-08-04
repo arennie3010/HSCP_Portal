@@ -4,8 +4,17 @@
 
 nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
 
-function(input, output, session) {
+shinyServer(function(input, output, session) {
   
-}
+  
+  selectedDada <- reactive({
+    d<-nhs24 %>%
+      filter(case_type == input$select_ind) %>%
+      filter()
+    
+    
+  })
+  
+})
 
 ## END

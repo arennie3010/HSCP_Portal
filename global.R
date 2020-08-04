@@ -92,6 +92,16 @@ write.csv(nhs24, file=gzfile("data/nhs24.csv.gz", compression = 9), row.names = 
 
 ##### end of nhs 24 extract #####
 
+##### Data build - daily data used ofr UC Impact Dashboard - includes Nnhs24, ecoss, gp ooh, sas, ae, ea data #####
+
+d1 <- read.csv('//conf/LIST_analytics/Glasgow City/COVID19/UC/02-data/outputs/UCdata-day.csv') %>%
+  clean_names() #%>%
+  rename(hb = "reporting_health_board_name_current") %>%
+  rename(date = "nhs_24_call_rcvd_date") %>%
+  rename(total_cases = "number_of_nhs_24_records_4") %>%
+  rename(covid_cases = "number_of_nhs_24_records_5") %>%
+  mutate(date = as.Date(date))
+
 
 ###############################################.    
 
