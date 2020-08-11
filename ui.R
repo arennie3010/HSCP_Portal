@@ -10,9 +10,9 @@ shinyUI(
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
                       hr(),
-                      p("This concept dashboard showcases data visualisation tools through Shiny to explore COVID-19 Related Unscheduled Care data.", style = "text-align:center;"),
+                      p("This concept dashboard showcases data visualisation tools through Shiny to explore Unscheduled Care data.", style = "text-align:center;"),
                       br(),
-                      strong(p("To begin, select 'Data Explore' in the Navigation Bar", style = "text-align:center;"))
+                      strong(p("To begin, select 'Data Explorer' in the Navigation Bar", style = "text-align:center;"))
                       ),
              
              ### SUMMARY TAB
@@ -23,7 +23,7 @@ shinyUI(
                           includeCSS(path = "www/shinydashboard.css"),
                           includeCSS(path = "www/font-awesome.css"),
                         
-                        sidebarPanel(selectInput("selectHSCPsummary", "Select HSCP", choices = "Glasgow City", selected = "Glasgow City"),
+                        sidebarPanel(selectInput("selectHSCPsummary", "Select HSCP", choices = unique(extract.UC$hscp), selected = "Glasgow City"),
                                      hr(),
                                      sliderInput("timeframesummary", "Weeks", min = 1, max = 25, 
                                                  ticks = TRUE, step = 1,  value = c(1,25),
@@ -40,21 +40,17 @@ shinyUI(
                       )),
              
              ### MAIN DATA EXPLORE TAB
-  tabPanel("Data Explore",
+  tabPanel("Data Explorer",
   fluidPage(
              sidebarPanel(
-               selectInput("selectHSCP", "Select HSCP", choices = "Glasgow City", selected = "Glasgow City"),
+               selectInput("selectHSCP", "Select HSCP", choices = unique(extract.UC$hscp), selected = "Glasgow City"),
                hr(),
                selectInput("select_service", label = "Indicator", 
-                           choices = list("Unplanned Admissions" = "ea",
-                                          "A&E" = "ae", 
-                                          "NHS24" = "nhs24",
-                                          "GP OOH" = "ooh",
-                                          "SAS" = "sas",
-                                          "ECOSS" = "ecoss",
-                                          "Deaths" = "deaths"), 
-                           selected = "ecoss"),
-               radioButtons("select_ind", "COVID19/Total Cases",  choices = c("covid","total"), selected = "covid"),
+                           choices = list("A&E" = "A&E", 
+                                          "NHS24" = "NHS24",
+                                          "GP OOH" = "OOH"), 
+                           selected = "NHS24"),
+               radioButtons("select_ind", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
                sliderInput("timeframe", "Weeks", min = 1, max = 25, 
                            ticks = TRUE, step = 1,  value = c(1,25),
                            dragRange = TRUE)),

@@ -3,7 +3,7 @@
 # of the app: charts, text,
 
 #nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
-iz <- read.csv("data/CONCEPT_DATA by IZ for GC.csv")
+iz <- read.csv("data/2020_data/UCdata-week.csv")
 
 shinyServer(function(input, output, session) {
   
@@ -20,7 +20,8 @@ shinyServer(function(input, output, session) {
     
     iz %>%
       filter(hscp == input$selectHSCP,
-             variable == input$select_service,
+             source == input$select_service,
+             year == 2020,
              week %in% input$timeframe[1]:input$timeframe[2],
              ind == input$select_ind) %>%
       mutate(text = paste0("Interzone: ", intzone, "\n", 
@@ -36,7 +37,7 @@ shinyServer(function(input, output, session) {
       ungroup() %>%
       mutate(text = paste0("Interzone: ", intzone, " \n", 
                            "Weeks: ", input$timeframe[1], " to ", input$timeframe[2], " \n", 
-                           "Mean Rate: ",round_half_up(value,1))) %>%
+                           "Mean Weekly", input$select_ind,":", round_half_up(value,1))) %>%
       rename(area_name = intzone)
     
     sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
