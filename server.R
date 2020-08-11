@@ -3,7 +3,8 @@
 # of the app: charts, text,
 
 #nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
-iz <- read.csv("data/2020_data/UCdata-week.csv")
+iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
+hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
 
 shinyServer(function(input, output, session) {
   
@@ -73,8 +74,9 @@ shinyServer(function(input, output, session) {
                 geom_tile(aes(fill = value)) +
                 geom_text(aes(label = format(round_half_up(value,digits = 1), nsmall = 1)), size=4) +
                 labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Weekly ", 
-                                  names(which(choice_list == input$select_service)), " Cases (", input$select_ind, ")"), 
-                     x="", y="") + 
+                                  names(which(choice_list == input$select_service)), " Cases (", input$select_service, ")"), 
+                     x="Week", y="") + 
+                scale_x_discrete(position = "top") +
                 scale_fill_viridis(option = "viridis") +
                 theme_grey(base_size = 16) + labs(fill = "Rate per\n1,000 population") +
                 theme(legend.position = "top")
@@ -92,6 +94,40 @@ shinyServer(function(input, output, session) {
       datatable(rownames = FALSE)
   })
   
+
+
+#### SUMMARY 
+
+  selected_summary_data <- reactive({
+    
+    hscp %>%
+      filter(hscp == input$selectHSCPsummary,
+             week %in% input$timeframesummary[1]:input$timeframesummary[2],
+             ind == input$select_indsummary) %>%
+      mutate(text = paste0("HSCP: ", hscp, "\n", 
+                           "Week: ", week, "\n", 
+                           "Rate: ",round_half_up(value,1)))
+    
+  })
+  
+  
+# CHART ! - NHS24 
+
+output$sc1 <- renderPlot({
+  
+  ggplot(subset(selected_summary_data(), source == "OOH"), aes(week, value)) +
+    geom_line(aes(group = year, colour = as.factor(year))) +
+    theme_classic()
+})
+
+output$sc2 <- renderPlot({
+  
+  ggplot(subset(selected_summary_data(), source == "A&E"), aes(week, value)) +
+    geom_line(aes(group = year, colour = as.factor(year))) +
+    theme_classic()
+})
+
+
 })
 
 ## END

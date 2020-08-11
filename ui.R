@@ -23,19 +23,26 @@ shinyUI(
                           includeCSS(path = "www/shinydashboard.css"),
                           includeCSS(path = "www/font-awesome.css"),
                         
-                        sidebarPanel(selectInput("selectHSCPsummary", "Select HSCP", choices = unique(extract.UC$hscp), selected = "Glasgow City"),
+                        sidebarPanel(width = 3, selectInput("selectHSCPsummary", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                                      hr(),
-                                     sliderInput("timeframesummary", "Weeks", min = 1, max = 25, 
-                                                 ticks = TRUE, step = 1,  value = c(1,25),
-                                                 dragRange = TRUE)),
-                        mainPanel(
+                                     sliderInput("timeframesummary", "Weeks", min = 18, max = 32, 
+                                                 ticks = TRUE, step = 1,  value = c(18,32),
+                                                 dragRange = TRUE),
+                                     radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate"), selected = "cases")),
+                      
+                        mainPanel(width = 9, 
                           infoBox("A&E Attendances", paste(20, "cases"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE),
                           infoBox("Non-Elective", paste(20, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE),
                           infoBox("SAS", paste(20, "cases"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE),
                           infoBox("GP OOH", paste(20, "cases"), icon=icon("clock", lib = "font-awesome"), fill = TRUE),
                           infoBox("NHS 24", paste(20, "cases"), icon=icon("phone", lib = "font-awesome"), fill = TRUE),
                           infoBox("ECOSS Testing", paste(20, "cases"), icon=icon("viruses", lib = "font-awesome"), fill = TRUE),
-                          infoBox("Deaths", paste(20, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE)
+                          infoBox("Deaths", paste(20, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE),
+                          
+                          plotOutput("sc1", height = "400px", width = "70%")
+                          
+                          
+                          
                         )
                       )),
              
@@ -43,7 +50,7 @@ shinyUI(
   tabPanel("Data Explorer",
   fluidPage(
              sidebarPanel(
-               selectInput("selectHSCP", "Select HSCP", choices = unique(extract.UC$hscp), selected = "Glasgow City"),
+               selectInput("selectHSCP", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                hr(),
                selectInput("select_service", label = "Indicator", 
                            choices = list("A&E" = "A&E", 
@@ -51,8 +58,8 @@ shinyUI(
                                           "GP OOH" = "OOH"), 
                            selected = "NHS24"),
                radioButtons("select_ind", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
-               sliderInput("timeframe", "Weeks", min = 1, max = 25, 
-                           ticks = TRUE, step = 1,  value = c(1,25),
+               sliderInput("timeframe", "Weeks", min = 18, max = 32, 
+                           ticks = TRUE, step = 1,  value = c(18,32),
                            dragRange = TRUE)),
                
                # sliderInput("timeframe", "Date", min = dmy(start_date), max = dmy(end_date),
