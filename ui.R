@@ -4,43 +4,46 @@
 
 
 shinyUI(
-  navbarPage(title = "Unscheduled Care - HSCP Portal", 
-             
+  navbarPage(title = "Unscheduled Care - HSCP Portal",
              tabPanel("About",
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
                       hr(),
                       p("This concept dashboard showcases data visualisation tools through Shiny to explore Unscheduled Care data.", style = "text-align:center;"),
                       br(),
-                      strong(p("To begin, select 'Data Explorer' in the Navigation Bar", style = "text-align:center;"))
-                      ),
+                      strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer.", style = "text-align:center;"),
+                      br())),
              
              ### SUMMARY TAB
              tabPanel("Summary",
                       fluidPage(
-                        
                           includeCSS(path = "www/AdminLTE.css"),
                           includeCSS(path = "www/shinydashboard.css"),
                           includeCSS(path = "www/font-awesome.css"),
-                        
-                        sidebarPanel(width = 3, selectInput("selectHSCPsummary", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
+                        sidebarPanel(style = "position:fixed;width:inherit;", width = 3, selectInput("selectHSCPsummary", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                                      hr(),
                                      sliderInput("timeframesummary", "Weeks", min = 18, max = 32, 
                                                  ticks = TRUE, step = 1,  value = c(18,32),
                                                  dragRange = TRUE),
-                                     radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate"), selected = "cases")),
-                      
-                        mainPanel(width = 9, 
+                                     radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate", "% change"), selected = "cases")),
+                        mainPanel( box(width = 12, 
                           infoBox("A&E Attendances", paste(20, "cases"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE),
                           infoBox("Non-Elective", paste(20, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE),
                           infoBox("SAS", paste(20, "cases"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE),
                           infoBox("GP OOH", paste(20, "cases"), icon=icon("clock", lib = "font-awesome"), fill = TRUE),
                           infoBox("NHS 24", paste(20, "cases"), icon=icon("phone", lib = "font-awesome"), fill = TRUE),
-                          infoBox("ECOSS Testing", paste(20, "cases"), icon=icon("viruses", lib = "font-awesome"), fill = TRUE),
-                          infoBox("Deaths", paste(20, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE),
+                          infoBox("Deaths", paste(20, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE)),
                           
-                          plotOutput("sc1", height = "400px", width = "70%")
-                          
+                          box(plotlyOutput("sc1"), width = 9),
+                          br(),
+                          box(textOutput("text1"), width = 3),
+                          br(),
+                          box(h3(plotlyOutput("sc2"), width = 9)),
+                          br(),
+                          box(textOutput("text2"),  width = 3),
+                          br(),
+                          box(plotlyOutput("sc3"), width = 9),
+                          box(textOutput("text3"),  width = 3)
                           
                           
                         )
