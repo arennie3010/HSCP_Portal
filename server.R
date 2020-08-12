@@ -159,7 +159,4 @@ output$sc3 <- renderPlotly({
 output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
 
 })
-
-
-
 ## END

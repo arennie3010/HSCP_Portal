@@ -12,7 +12,8 @@ shinyUI(
                       p("This concept dashboard showcases data visualisation tools through Shiny to explore Unscheduled Care data.", style = "text-align:center;"),
                       br(),
                       strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer.", style = "text-align:center;"),
-                      br())),
+                      br()),
+                      img(src='MicrosoftTeams-image.png', style="display: block; margin-left: auto; margin-right: auto;")),
              
              ### SUMMARY TAB
              tabPanel("Summary",
