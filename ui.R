@@ -4,7 +4,7 @@
 
 
 shinyUI(
-  navbarPage(title = "Unscheduled Care - HSCP Portal",
+  navbarPage(title = "Unscheduled Care - HSCP Portal", #position = "fixed-top",
              tabPanel("About",
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
@@ -18,15 +18,17 @@ shinyUI(
              ### SUMMARY TAB
              tabPanel("Summary",
                       fluidPage(
+                        br(),
                           includeCSS(path = "www/AdminLTE.css"),
                           includeCSS(path = "www/shinydashboard.css"),
                           includeCSS(path = "www/font-awesome.css"),
+                        br(),
                         sidebarPanel(style = "position:fixed;width:inherit;", width = 3, selectInput("selectHSCPsummary", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                                      hr(),
                                      sliderInput("timeframesummary", "Weeks", min = 18, max = 32, 
                                                  ticks = TRUE, step = 1,  value = c(18,32),
                                                  dragRange = TRUE),
-                                     radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate", "% change"), selected = "cases")),
+                                     radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate", "change"), selected = "cases")),
                         mainPanel( box(width = 12, 
                           infoBox("A&E Attendances", paste(20, "cases"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE),
                           infoBox("Non-Elective", paste(20, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE),
@@ -39,7 +41,7 @@ shinyUI(
                           br(),
                           box(textOutput("text1"), width = 3),
                           br(),
-                          box(h3(plotlyOutput("sc2"), width = 9)),
+                          box(plotlyOutput("sc2"), width = 9),
                           br(),
                           box(textOutput("text2"),  width = 3),
                           br(),
@@ -74,7 +76,7 @@ shinyUI(
                          tabPanel("Map",
                                   leafletOutput("map_iz")),
                          tabPanel("Heatchart",
-                                  plotOutput("heatchart_iz", height = "2000px")
+                                  plotOutput("heatchart_iz", height = "4000px")
                                   # tags$div("Loading...", id = "loadmessage"),
                                   # tags$script(
                                   #   HTML(
@@ -92,7 +94,33 @@ shinyUI(
                                   dataTableOutput("datatable_iz")))
   
   ))
-  )# tabPanel bracket
+  ),
+  tabPanel("Create Report",
+           inputPanel(
+             selectInput("selectHSCPrmd", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
+             checkboxGroupInput("select_service_rmd", label = "Indicator", 
+                                choices = list("A&E" = "A&E", 
+                                               "NHS24" = "NHS24",
+                                               "GP OOH" = "OOH"),
+                                selected = "A&E"),
+             radioButtons("select_ind_rmd", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
+             sliderInput("timeframe_rmd", "Weeks", min = 18, max = 32, 
+                         ticks = TRUE, step = 1,  value = c(18,32),
+                         dragRange = TRUE),
+             downloadButton("RMD", "Knit Report")),
+           fluidRow(
+             
+             # create plots for user selected services
+             column(conditionalPanel(condition = "'A&E' %in% input.select_service_rmd",
+                              plotOutput("ae_plot_rmd")),width = 4),
+             column(conditionalPanel(condition = "'NHS24' %in% input.select_service_rmd",
+                              plotOutput("nhs24_plot_rmd")), width = 4),
+             column(conditionalPanel(condition = "'GP OOH' %in% input.select_service_rmd",
+                              plotOutput("gpooh_plot_rmd")), width = 4)
+             
+             
+           )
+  )  # tabPanel bracket
 ) # navbarPage bracket
 
 ## END

@@ -3,8 +3,8 @@
 # of the app: charts, text,
 
 #nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
-iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
-hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
+# iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
+# hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
 
 shinyServer(function(input, output, session) {
   
@@ -121,7 +121,7 @@ shinyServer(function(input, output, session) {
 output$sc1 <- renderPlotly({
   
     ggplotly(ggplot(subset(selected_summary_data(), source == "OOH"), aes(week, value)) +
-    geom_line(aes(group = year, colour = factor(year))) +
+    geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
     theme_classic()  +
       theme(legend.title = element_blank()) +
     labs(title = "GP OOH Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
@@ -135,7 +135,7 @@ output$text1 <- renderText({"Chart commentary for GP OOH chart which will be aut
 output$sc2 <- renderPlotly({
   
   ggplotly(ggplot(subset(selected_summary_data(), source == "A&E"), aes(week, value)) +
-    geom_line(aes(group = year, colour = factor(year))) +
+    geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
     theme_classic()  +
       theme(legend.title = element_blank()) +
     labs(title = "A&E Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
@@ -148,7 +148,7 @@ output$text2 <- renderText({"Chart commentary for A&E chart which will be automa
 output$sc3 <- renderPlotly({
   
   ggplotly(ggplot(subset(selected_summary_data(), source == "NHS24"), aes(week, value)) +
-    geom_line(aes(group = year, colour = factor(year))) +
+    geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
     theme_classic() +
       theme(legend.title = element_blank()) +
     labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
@@ -157,6 +157,91 @@ output$sc3 <- renderPlotly({
 })
 
 output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
+
+## REPORT
+selected_report_data <- reactive({
+  
+  hscp %>%
+    filter(hscp == input$selectHSCPrmd,
+           week %in% input$timeframe_rmd[1]:input$timeframe_rmd[2],
+           ind == input$select_ind_rmd,
+           source %in% input$select_service_rmd)
+  
+})
+
+
+P1_RMD <- reactive({
+  if("A&E" %in% input$select_service_rmd){
+  selected_report_data() %>%
+    spread(year,value) %>%
+    mutate(difference = `2020` - `2019`)  %>% filter(source == "A&E") %>%
+    ggplot(aes(x= week, ymin = 0, ymax = difference)) +
+    geom_ribbon(alpha = 0.7, fill = "#43358b") +
+    theme_minimal() +
+    labs(x = "Week of the Year", paste("Difference in", input$select_ind_rmd, "from 2019"),
+         title = paste("Difference between", input$select_ind_rmd, "at", 
+                       "A&E in 2019 and 2020 by week"))
+  }else{}
+})
+
+output$ae_plot_rmd <- renderPlot({
+    P1_RMD()
+})
+
+
+P2_RMD <- reactive({
+  if("NHS24" %in% input$select_service_rmd){
+    selected_report_data() %>% filter(source == "NHS24") %>%
+      ggplot(aes(x= week, y = value)) +
+      geom_line(alpha = 0.7, colour = "#43358b", size = 1.5) +
+      theme_minimal() +
+      labs(x = "Week of the Year", paste("Difference in", input$select_ind_rmd, "from 2019"),
+           title = paste("NHS24", input$select_ind_rmd, "in 2020 by week"))}else{}
+})
+
+output$nhs24_plot_rmd <- renderPlot({
+    P2_RMD()
+})
+
+P3_RMD <- reactive({
+  if("OOH" %in% input$select_service_rmd){
+  selected_report_data() %>%
+    spread(year,value) %>%
+    mutate(difference = `2020` - `2019`)  %>% filter(source == "OOH") %>%
+    ggplot(aes(x= week, ymin = 0, ymax = difference)) +
+    geom_ribbon(alpha = 0.7, fill = "#43358b") +
+    theme_minimal() +
+    labs(x = "Week of the Year", paste("Difference in", input$select_ind_rmd, "from 2019"),
+         title = paste("Difference between", input$select_ind_rmd, "at", 
+                       "GP OOH in 2019 and 2020 by week"))}else{}
+})
+
+output$gpooh_plot_rmd<- renderPlot({
+    P3_RMD()
+  })
+
+# observeEvent(input$RMD, {
+#   rmarkdown::render(input = "RMarkdown script.Rmd")
+# }
+#              )
+
+output$RMD<- downloadHandler(
+  filename = function() {
+    paste(input$selectHSCPrmd, "HSCP Report.docx")
+  },
+content = function(file) {
+  # Copy the report file to a temporary directory before processing it, in
+  # case we don't have write permissions to the current working dir (which
+  # can happen when deployed).
+  tempReport <- file.path(tempdir(), "report.Rmd")
+  file.copy("RMarkdown script.Rmd", tempReport, overwrite = TRUE)
+  
+  # Knit the document, passing in the `params` list, and eval it in a
+  # child of the global environment (this isolates the code in the document
+  # from the code in this app).
+  rmarkdown::render(input = "RMarkdown script.Rmd", output_file = file, output_format = "word_document")
+  })
+
 
 })
 ## END
