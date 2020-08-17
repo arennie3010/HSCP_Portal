@@ -49,6 +49,10 @@ end_date <- as.Date("30-06-2020", format = "%d-%m-%Y")
 ## IZ Boundaries
 iz_bounds <- readRDS("data/IZ_boundary.rds")
 
+## Data
+iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
+hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
+
 
 ##### Location lookup #####
 # read in postcode directory file to establish lat & long of patients 
