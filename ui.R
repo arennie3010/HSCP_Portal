@@ -4,14 +4,14 @@
 
 
 shinyUI(
-  navbarPage(title = "Unscheduled Care - HSCP Portal", #position = "fixed-top",
+  navbarPage(title = "Unscheduled Care - HSCP Portal", #position = "fixed-top", 
              tabPanel("About",
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
                       hr(),
                       p("This concept dashboard showcases data visualisation tools through Shiny to explore Unscheduled Care data.", style = "text-align:center;"),
                       br(),
-                      strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer.", style = "text-align:center;"),
+                      strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer'.", style = "text-align:center;"),
                       br()),
                       img(src='MicrosoftTeams-image.png', style="display: block; margin-left: auto; margin-right: auto;")),
              
@@ -30,12 +30,12 @@ shinyUI(
                                                  dragRange = TRUE),
                                      radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate", "change"), selected = "cases")),
                         mainPanel( box(width = 12, 
-                          infoBox("A&E Attendances", paste(20, "cases"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE),
-                          infoBox("Non-Elective", paste(20, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE),
-                          infoBox("SAS", paste(20, "cases"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE),
-                          infoBox("GP OOH", paste(20, "cases"), icon=icon("clock", lib = "font-awesome"), fill = TRUE),
-                          infoBox("NHS 24", paste(20, "cases"), icon=icon("phone", lib = "font-awesome"), fill = TRUE),
-                          infoBox("Deaths", paste(20, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE)),
+                          infoBox("A&E Attendances", paste(20, "cases"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("Non-Elective", paste(20, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("SAS", paste(20, "cases"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("GP OOH", paste(20, "cases"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("NHS 24", paste(20, "cases"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("Deaths", paste(20, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE, color = "purple")),
                           
                           box(plotlyOutput("sc1"), width = 9),
                           br(),

@@ -120,13 +120,16 @@ shinyServer(function(input, output, session) {
 
 output$sc1 <- renderPlotly({
   
+  
+  
     ggplotly(ggplot(subset(selected_summary_data(), source == "OOH"), aes(week, value)) +
     geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
     theme_classic()  +
-      theme(legend.title = element_blank()) +
+      theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
+      scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "GP OOH Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
-    config(displayModeBar = FALSE)
+    config(displayModeBar = FALSE) 
  
 })
 
@@ -137,7 +140,8 @@ output$sc2 <- renderPlotly({
   ggplotly(ggplot(subset(selected_summary_data(), source == "A&E"), aes(week, value)) +
     geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
     theme_classic()  +
-      theme(legend.title = element_blank()) +
+      theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
+      scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "A&E Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
     config(displayModeBar = FALSE)
@@ -150,13 +154,16 @@ output$sc3 <- renderPlotly({
   ggplotly(ggplot(subset(selected_summary_data(), source == "NHS24"), aes(week, value)) +
     geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
     theme_classic() +
-      theme(legend.title = element_blank()) +
+      theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
+      scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
     config(displayModeBar = FALSE)
 })
 
-output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
+output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown.
+  
+  second paragraph"})
 
 ## REPORT
 selected_report_data <- reactive({
