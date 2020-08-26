@@ -34,9 +34,8 @@ shinyUI(
                           infoBox("Non-Elective", paste(90, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("SAS", paste(84, "cases"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("GP OOH", paste(111, "cases"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("NHS 24", paste(101, "cases"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("Deaths", paste(38, "cases"), icon=icon("user", lib = "font-awesome"), fill = TRUE, color = "purple")),
-                          
+                          infoBox("NHS 24", paste(101, "cases"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple")),
+
                           box(plotlyOutput("sc1"), width = 9),
                           br(),
                           box(textOutput("text1"), width = 3),
@@ -59,9 +58,11 @@ shinyUI(
                selectInput("selectHSCP", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                hr(),
                selectInput("select_service", label = "Indicator", 
-                           choices = list("A&E" = "A&E", 
+                           choices = list("A&E" = "A&E",
+                                          "EA" = "EA",
                                           "NHS24" = "NHS24",
-                                          "GP OOH" = "OOH"), 
+                                          "GP OOH" = "OOH",
+                                          "SAS" = "SAS"), 
                            selected = "NHS24"),
                radioButtons("select_ind", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
                sliderInput("timeframe", "Weeks", min = 18, max = 32, 
@@ -99,9 +100,11 @@ shinyUI(
            inputPanel(
              selectInput("selectHSCPrmd", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
              checkboxGroupInput("select_service_rmd", label = "Indicator", 
-                                choices = list("A&E" = "A&E", 
+                                choices = list("A&E" = "A&E",
+                                               "EA" = "EA",
                                                "NHS24" = "NHS24",
-                                               "GP OOH" = "OOH"),
+                                               "GP OOH" = "OOH",
+                                               "SAS" = "SAS"),
                                 selected = "A&E"),
              radioButtons("select_ind_rmd", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
              sliderInput("timeframe_rmd", "Weeks", min = 18, max = 32, 
@@ -113,8 +116,12 @@ shinyUI(
              # create plots for user selected services
              column(conditionalPanel(condition = "'A&E' %in% input.select_service_rmd",
                               plotOutput("ae_plot_rmd")),width = 4),
+             column(conditionalPanel(condition = "'EA' %in% input.select_service_rmd",
+                                     plotOutput("EA_plot_rmd")), width = 4),
              column(conditionalPanel(condition = "'NHS24' %in% input.select_service_rmd",
                               plotOutput("nhs24_plot_rmd")), width = 4),
+             column(conditionalPanel(condition = "'SAS' %in% input.select_service_rmd",
+                                     plotOutput("SAS_plot_rmd")), width = 4),
              column(conditionalPanel(condition = "'GP OOH' %in% input.select_service_rmd",
                               plotOutput("gpooh_plot_rmd")), width = 4)
              
