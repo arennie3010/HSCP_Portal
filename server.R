@@ -36,8 +36,12 @@ shinyServer(function(input, output, session) {
       group_by(intzone) %>%
       summarise(value = mean(value)) %>%
       ungroup() %>%
+      #
+      mutate(tile_rank = ntile(value,10)) %>%
+      #
       mutate(text = paste0("Interzone: ", intzone, " \n", 
                            "Weeks: ", input$timeframe[1], " to ", input$timeframe[2], " \n", 
+                           #
                            "Mean Weekly", input$select_ind,":", round_half_up(value,1))) %>%
       rename(area_name = intzone)
     
@@ -50,7 +54,7 @@ shinyServer(function(input, output, session) {
       
     pal <- colorNumeric(
       palette = colorRampPalette(c("#FFFFB7","#FF9100","red"), bias = 2.5)(length(map_dat()$area_name)), 
-      domain = c(min(map_dat()$value):max(map_dat()$value+1)))
+      domain = c(min(map_dat()$tile_rank):max(map_dat()$tile_rank+1)))
     
     leaflet() %>% 
       addProviderTiles(providers$CartoDB.Positron) %>%
@@ -58,7 +62,7 @@ shinyServer(function(input, output, session) {
                   color = "#444444", weight = 2, smoothFactor = 0.5,
                   #tooltip
                   label = (map_dat()$text),
-                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(map_dat()$value), #Colours
+                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(map_dat()$tile_rank), #Colours
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)
       )
@@ -159,11 +163,26 @@ output$sc3 <- renderPlotly({
     labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
     config(displayModeBar = FALSE)
+  
+  output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
+  
+  output$sc4 <- renderPlotly({
+    
+    ggplotly(ggplot(subset(selected_summary_data(), source == "SAS"), aes(week, value)) +
+               geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
+               theme_classic()  +
+               theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
+               scale_color_manual(values=c("mediumpurple1", "#43358b")) +
+               labs(title = "SAS Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
+                    caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
+      config(displayModeBar = FALSE)
+  })
+  
+  output$text4 <- renderText({"Chart commentary for SAS chart which will be automated via RMarkdown."})
+  
 })
 
-output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown.
-  
-  second paragraph"})
+
 
 ## REPORT
 selected_report_data <- reactive({
@@ -227,6 +246,19 @@ output$gpooh_plot_rmd<- renderPlot({
     P3_RMD()
   })
 
+P4_RMD <- reactive({
+  if("SAS" %in% input$select_service_rmd){
+    selected_report_data() %>% filter(source == "SAS") %>%
+      ggplot(aes(x= week, y = value)) +
+      geom_line(alpha = 0.7, colour = "#43358b", size = 1.5) +
+      theme_minimal() +
+      labs(x = "Week of the Year", paste("Difference in", input$select_ind_rmd, "from 2019"),
+           title = paste("SAS", input$select_ind_rmd, "in 2020 by week"))}else{}
+})
+
+output$sas_plot_rmd <- renderPlot({
+  P4_RMD()
+})
 # observeEvent(input$RMD, {
 #   rmarkdown::render(input = "RMarkdown script.Rmd")
 # }
