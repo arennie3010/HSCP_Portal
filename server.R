@@ -50,7 +50,8 @@ shinyServer(function(input, output, session) {
   })
   
   ## MAP
-  output$map_iz <- renderLeaflet({
+  output$map_iz <- renderLeaflet(
+    {
       
     pal <- colorNumeric(
       palette = colorRampPalette(c("#FFFFB7","#FF9100","red"), bias = 2.5)(length(map_dat()$area_name)), 
@@ -70,7 +71,11 @@ shinyServer(function(input, output, session) {
   })
   
   ## HEATCHART
-  output$heatchart_iz <- renderPlot({
+  output$heatchart_iz <- renderPlot(
+    height = function () 400+length(selected_IZ_data()$intzone),
+
+    
+    {
     
 
     ggplot(selected_IZ_data(), aes(week, intzone, fill= value, text=text)) + 
