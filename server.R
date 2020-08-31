@@ -37,7 +37,7 @@ shinyServer(function(input, output, session) {
       summarise(value = mean(value)) %>%
       ungroup() %>%
       #
-      mutate(tile_rank = ntile(value,10)) %>%
+      mutate(tile_rank = ntile(value,5)) %>%
       #
       mutate(text = paste0("Interzone: ", intzone, " \n", 
                            "Weeks: ", input$timeframe[1], " to ", input$timeframe[2], " \n", 
@@ -55,7 +55,7 @@ shinyServer(function(input, output, session) {
       
     pal <- colorNumeric(
       palette = colorRampPalette(c("#FFFFB7","#FF9100","red"), bias = 2.5)(length(map_dat()$area_name)), 
-      domain = c(min(map_dat()$tile_rank):max(map_dat()$tile_rank+1)))
+      domain = c(min(map_dat()$tile_rank):max(map_dat()$tile_rank)))
     
     leaflet() %>% 
       addProviderTiles(providers$CartoDB.Positron) %>%
