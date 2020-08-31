@@ -42,7 +42,7 @@ shinyServer(function(input, output, session) {
       mutate(text = paste0("Interzone: ", intzone, " \n", 
                            "Weeks: ", input$timeframe[1], " to ", input$timeframe[2], " \n", 
                            #
-                           "Mean Weekly", input$select_ind,":", round_half_up(value,1))) %>%
+                           "Mean Weekly ", input$select_ind,": ", round_half_up(value,1))) %>%
       rename(area_name = intzone)
     
     sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
@@ -72,7 +72,7 @@ shinyServer(function(input, output, session) {
   
   ## HEATCHART
   output$heatchart_iz <- renderPlot(
-    height = function () 400+length(selected_IZ_data()$intzone),
+    height = function () 800+10*length(unique(selected_IZ_data()$intzone)),
 
     
     {

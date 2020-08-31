@@ -25,8 +25,8 @@ shinyUI(
                         br(),
                         sidebarPanel(style = "position:fixed;width:inherit;", width = 3, selectInput("selectHSCPsummary", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                                      hr(),
-                                     sliderInput("timeframesummary", "Weeks", min = 18, max = 32, 
-                                                 ticks = TRUE, step = 1,  value = c(18,32),
+                                     sliderInput("timeframesummary", "Weeks", min = 18, max = 30, 
+                                                 ticks = TRUE, step = 1,  value = c(18,30),
                                                  dragRange = TRUE),
                                      radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate", "change"), selected = "cases")),
                         mainPanel( box(width = 12, 
@@ -45,7 +45,13 @@ shinyUI(
                           box(textOutput("text2"),  width = 3),
                           br(),
                           box(plotlyOutput("sc3"), width = 9),
-                          box(textOutput("text3"),  width = 3)
+                          br(),
+                          box(textOutput("text3"),  width = 3),
+                          br(),
+                          box(plotlyOutput("sc4"), width = 9),
+                          br(),
+                          box(textOutput("text4"),  width = 3)
+                          
                           
                           
                         )
@@ -64,9 +70,9 @@ shinyUI(
                                           "GP OOH" = "OOH",
                                           "SAS" = "SAS"), 
                            selected = "NHS24"),
-               radioButtons("select_ind", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
-               sliderInput("timeframe", "Weeks", min = 18, max = 32, 
-                           ticks = TRUE, step = 1,  value = c(18,32),
+               radioButtons("select_ind", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate", "change"), selected = "cases"),
+               sliderInput("timeframe", "Weeks", min = 18, max = 30, 
+                           ticks = TRUE, step = 1,  value = c(18,30),
                            dragRange = TRUE)),
                
                # sliderInput("timeframe", "Date", min = dmy(start_date), max = dmy(end_date),
@@ -75,9 +81,9 @@ shinyUI(
              mainPanel(
              tabsetPanel(type = "tabs",
                          tabPanel("Map",
-                                  leafletOutput("map_iz")),
+                                  leafletOutput("map_iz", height = 800)),
                          tabPanel("Heatchart",
-                                  plotOutput("heatchart_iz", height = "4000px")
+                                  plotOutput("heatchart_iz", height = 800)
                                   # tags$div("Loading...", id = "loadmessage"),
                                   # tags$script(
                                   #   HTML(
@@ -107,8 +113,8 @@ shinyUI(
                                                "SAS" = "SAS"),
                                 selected = "A&E"),
              radioButtons("select_ind_rmd", "Number of Cases/Rate (per 1,000 population)",  choices = c("cases","rate"), selected = "cases"),
-             sliderInput("timeframe_rmd", "Weeks", min = 18, max = 32, 
-                         ticks = TRUE, step = 1,  value = c(18,32),
+             sliderInput("timeframe_rmd", "Weeks", min = 18, max = 30, 
+                         ticks = TRUE, step = 1,  value = c(18,30),
                          dragRange = TRUE),
              downloadButton("RMD", "Knit Report")),
            fluidRow(
