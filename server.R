@@ -38,7 +38,7 @@ shinyServer(function(input, output, session) {
       group_by(intzone) %>%
       summarise(value = mean(value)) %>%
       ungroup() %>%
-      #
+      # Create percentiles for the colours being used
       mutate(tile_rank = ntile(value,10)) %>%
       #
       mutate(text = paste0("Interzone: ", intzone, " \n", 
@@ -88,7 +88,8 @@ shinyServer(function(input, output, session) {
                                   names(which(choice_list == input$select_service)), " Cases (", input$select_service, ")"), 
                      x="Week", y="") + 
                 scale_x_discrete(position = "top") +
-                scale_fill_viridis(option = "viridis") +
+        # Can choose different colour scales if required
+                scale_fill_viridis_c(option = "B") +
                 theme_grey(base_size = 16) + labs(fill = "Rate per\n1,000 population") +
                 theme(legend.position = "none")
     
@@ -126,8 +127,23 @@ shinyServer(function(input, output, session) {
     
   })
   
-  
+
+    
 # CHART ! - SUMMARY
+
+info_data <- reactive({
+  hscp %>%
+    filter(hscp == input$selectHSCPsummary,
+           week %in% input$timeframesummary[1]:input$timeframesummary[2],
+           ind == input$select_indsummary) %>%
+    group_by(source) %>%
+    summarise(value = sum(value)) %>%
+    ungroup()
+  
+})
+  
+#infoboxes 
+output$aebox <- renderPrint({info_data() %>% filter(source == "A&E") %>% select(value)})
 
 output$sc1 <- renderPlotly({
   

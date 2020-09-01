@@ -30,7 +30,7 @@ shinyUI(
                                                  dragRange = TRUE),
                                      radioButtons("select_indsummary", "Cases/Rate",  choices = c("cases","rate", "change"), selected = "cases")),
                         mainPanel( box(width = 12, 
-                          infoBox("A&E Attendances", paste(132, "cases"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("A&E Attendances", value=htmlOutput("aebox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("Non-Elective", paste(90, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("SAS", paste(84, "cases"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("GP OOH", paste(111, "cases"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
