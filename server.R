@@ -25,6 +25,8 @@ shinyServer(function(input, output, session) {
              year == 2020,
              week %in% input$timeframe[1]:input$timeframe[2],
              ind == input$select_ind) %>%
+      # create percentiles for heatchart fill
+      mutate(tile_rank = ntile(value,20)) %>%
       mutate(text = paste0("Interzone: ", intzone, "\n", 
                            "Week: ", week, "\n", 
                            "Rate: ",round_half_up(value,1)))
@@ -37,7 +39,7 @@ shinyServer(function(input, output, session) {
       summarise(value = mean(value)) %>%
       ungroup() %>%
       #
-      mutate(tile_rank = ntile(value,5)) %>%
+      mutate(tile_rank = ntile(value,10)) %>%
       #
       mutate(text = paste0("Interzone: ", intzone, " \n", 
                            "Weeks: ", input$timeframe[1], " to ", input$timeframe[2], " \n", 
@@ -78,9 +80,9 @@ shinyServer(function(input, output, session) {
     {
     
 
-    ggplot(selected_IZ_data(), aes(week, intzone, fill= value, text=text)) + 
+    ggplot(selected_IZ_data(), aes(week, intzone, fill= tile_rank, text=text)) + 
                 scale_y_discrete(limits = unique(rev(selected_IZ_data()$intzone))) + # reverses y axis - alphabetical from top
-                geom_tile(aes(fill = value)) +
+                geom_tile(aes(fill = tile_rank)) +
                 geom_text(aes(label = format(round_half_up(value,digits = 1), nsmall = 1)), size=4) +
                 labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Weekly ", 
                                   names(which(choice_list == input$select_service)), " Cases (", input$select_service, ")"), 
@@ -88,7 +90,7 @@ shinyServer(function(input, output, session) {
                 scale_x_discrete(position = "top") +
                 scale_fill_viridis(option = "viridis") +
                 theme_grey(base_size = 16) + labs(fill = "Rate per\n1,000 population") +
-                theme(legend.position = "top")
+                theme(legend.position = "none")
     
   })
   
