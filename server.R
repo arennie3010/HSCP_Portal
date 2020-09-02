@@ -83,15 +83,16 @@ shinyServer(function(input, output, session) {
     ggplot(selected_IZ_data(), aes(week, intzone, fill= tile_rank, text=text)) + 
                 scale_y_discrete(limits = unique(rev(selected_IZ_data()$intzone))) + # reverses y axis - alphabetical from top
                 geom_tile(aes(fill = tile_rank)) +
-                geom_text(aes(label = format(round_half_up(value,digits = 1), nsmall = 1)), size=4) +
+                geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4) +
                 labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Weekly ", 
-                                  names(which(choice_list == input$select_service)), " Cases (", input$select_service, ")"), 
+                                  names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
                      x="Week", y="") + 
                 scale_x_discrete(position = "top") +
         # Can choose different colour scales if required
-                scale_fill_viridis_c(option = "B") +
+                scale_fill_viridis_c(option = "D") +
                 theme_grey(base_size = 16) + labs(fill = "Rate per\n1,000 population") +
-                theme(legend.position = "none")
+                theme(legend.position = "none",
+                      plot.title = element_text(family="helvetica", face = "bold"))
     
   })
   
@@ -137,7 +138,7 @@ info_data <- reactive({
            week %in% input$timeframesummary[1]:input$timeframesummary[2],
            ind == input$select_indsummary) %>%
     group_by(source) %>%
-    summarise(value = sum(value)) %>%
+    summarise(value = format(round(mean(value),0),big.mark=",")) %>%
     ungroup() 
   
 })
