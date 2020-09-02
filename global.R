@@ -31,13 +31,16 @@ library(leaflet)
 
 ###############################################.
 ## Data ----
-choice_list <- list("Unplanned Admissions" = "ea",
-                              "A&E" = "ae", 
-                              "NHS24" = "nhs24",
-                              "GP OOH" = "ooh",
-                              "SAS" = "sas",
-                              "ECOSS" = "ecoss",
-                              "Deaths" = "deaths")
+
+setwd("/conf/LIST_analytics/West Hub/02 - Scaled Up Work/COVID-19/HSCP Portal_Dashboard/UC_HSCP app/HSCP_Portal/")
+source_list <- list("A&E Attendances" = "A&E", 
+                              "NHS24 Calls" = "NHS24",
+                              "GP OOH Attendances" = "OOH",
+                              "Scottish Ambulance Services" = "SAS")
+
+measure_list <- list("Total cases" = "cases",
+                     "Rate (per 1,000 population)" = "rate",
+                     "Yearly change (%)" = "change")
 
 ##########    Generic data files which include app date limits, location lookups and population lookups ##########
 
@@ -47,7 +50,8 @@ end_date <- as.Date("30-06-2020", format = "%d-%m-%Y")
 
 
 ## IZ Boundaries
-iz_bounds <- readRDS("data/IZ_boundary.rds")
+iz_bounds <- readRDS("data/IZ_boundary_test.rds")
+
 
 ## Data
 iz <- read.csv("data/2020_data/UCdata-week-iz.csv")

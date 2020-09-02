@@ -129,7 +129,7 @@ shinyServer(function(input, output, session) {
   
 
     
-# CHART ! - SUMMARY
+
 
 info_data <- reactive({
   hscp %>%
@@ -138,13 +138,19 @@ info_data <- reactive({
            ind == input$select_indsummary) %>%
     group_by(source) %>%
     summarise(value = sum(value)) %>%
-    ungroup()
+    ungroup() 
   
 })
   
 #infoboxes 
-output$aebox <- renderPrint({info_data() %>% filter(source == "A&E") %>% select(value)})
+output$aebox <- renderText({as.character(info_data() %>% filter(source == "A&E") %>% select(value))})
+output$oohbox <- renderText({as.character(info_data() %>% filter(source == "OOH") %>% select(value))})
+output$nhs24box <- renderText({as.character(info_data() %>% filter(source == "NHS24") %>% select(value))})
+output$sasbox <- renderText({as.character(info_data() %>% filter(source == "SAS") %>% select(value))})
 
+
+
+# CHART ! - SUMMARY
 output$sc1 <- renderPlotly({
   
   
@@ -186,7 +192,7 @@ output$sc3 <- renderPlotly({
     labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
     config(displayModeBar = FALSE)
-  
+})
   output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
   
   output$sc4 <- renderPlotly({
@@ -203,7 +209,7 @@ output$sc3 <- renderPlotly({
   
   output$text4 <- renderText({"Chart commentary for SAS chart which will be automated via RMarkdown."})
   
-})
+
 
 
 
