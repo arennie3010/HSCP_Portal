@@ -83,14 +83,17 @@ shinyServer(function(input, output, session) {
     ggplot(selected_IZ_data(), aes(week, intzone, fill= tile_rank, text=text)) + 
                 scale_y_discrete(limits = unique(rev(selected_IZ_data()$intzone))) + # reverses y axis - alphabetical from top
                 geom_tile(aes(fill = tile_rank)) +
-                geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4) +
+                geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4.5) +
                 labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Weekly ", 
                                   names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
                      x="Week", y="") + 
-                scale_x_discrete(position = "top") +
+                scale_x_discrete(position = "top", limits = input$timeframesummary[1]:input$timeframesummary[2]) +
         # Can choose different colour scales if required
-                scale_fill_viridis_c(option = "D") +
-                theme_grey(base_size = 16) + labs(fill = "Rate per\n1,000 population") +
+                #scale_fill_viridis_c(option = "C") +
+                scale_fill_continuous(low = "#FFFFB7",
+                                      high = "red") +
+                theme_grey(base_size = 16) + 
+                labs(fill = "Rate per\n1,000 population") +
                 theme(legend.position = "none",
                       plot.title = element_text(family="helvetica", face = "bold"))
     
