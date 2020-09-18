@@ -2,6 +2,8 @@
 # This is the server script, it produces the outputs and reactive objects
 # of the app: charts, text,
 
+# test
+
 #nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
 # iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
 # hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
