@@ -36,7 +36,7 @@ shinyUI(
                          # infoBox("Non-Elective", paste(90, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("SAS (weekly average)", value=htmlOutput("sasbox"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("GP OOH (weekly average)", value=htmlOutput("oohbox"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("NHS 24 Calls (weekly average)", value=htmlOutput("nhs24box"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple")),
+                          infoBox("NHS24 records (weekly average)", value=htmlOutput("nhs24box"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple")),
 
                           box(plotlyOutput("sc1"), width = 9),
                           br(),
@@ -137,13 +137,15 @@ shinyUI(
            p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
            br(),
            strong(p("GP Out of Hours Records", style = "text-align:left;")),
-           p("*insert defintiion of GP OOH records included*", style = "text-align:left;"),
+           p("The statistics included cover patients attending Out of Hours (OOH) Primary Care services. Patients attend these services when their registered GP Practices are closed and they need urgent care.", style = "text-align:left;"),
+           p("A single case may be made up of multiple consultations.", style = "text-align:left;"),
            br(),
            strong(p("Scottish Ambulance Service Records", style = "text-align:left;")),
            p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
            br(),
            strong(p("Accident and Emergency Admission Records", style = "text-align:left;")),
-           p("*insert defintiion of A&E records included*", style = "text-align:left;")
+           p(" The statistics included cover attendances to all A&E services and are derived from the A&E datamart which includes more detailed information.", style = "text-align:left;"),
+           p("Includes ED and MIU attendances only, does not include Assessent Unit attendances.", style = "text-align:left;")
 )
   
   
