@@ -126,8 +126,28 @@ shinyUI(
              
              
            )
-  )  # tabPanel bracket
-) # navbarPage bracket
+  ),  # tabPanel bracket
+  tabPanel("Notes",
+           ### Add info about Portal
+           h3("HSCP Portal Concept Dashboard - Notes", style = "text-align:left;"),
+           hr(),
+           p("This tab will show information regarding the timeliness of the data as well as important details around it", style = "text-align:left;"),
+           br(),
+           strong(p("NHS24 Records", style = "text-align:left;")),
+           p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
+           br(),
+           strong(p("GP Out of Hours Records", style = "text-align:left;")),
+           p("*insert defintiion of GP OOH records included*", style = "text-align:left;"),
+           br(),
+           strong(p("Scottish Ambulance Service Records", style = "text-align:left;")),
+           p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
+           br(),
+           strong(p("Accident and Emergency Admission Records", style = "text-align:left;")),
+           p("*insert defintiion of A&E records included*", style = "text-align:left;")
+)
+  
+  
+  ) # navbarPage bracket
 
 ## END
 )
