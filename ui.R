@@ -6,7 +6,15 @@
 
 shinyUI(
   
-  navbarPage(title = "Unscheduled Care - HSCP Portal",#position = "fixed-top", 
+  navbarPage(title = "Unscheduled Care - HSCP Portal", 
+             #windowTitle = div(
+            #   div(
+            #     id = "img-id",
+            #     img(src = "MicrosoftTeams-image.png")
+            #   )),
+
+             
+             
              tabPanel("About",
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
