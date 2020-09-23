@@ -25,6 +25,7 @@ library(writexl)
 library(DT)
 library(viridis)
 library(leaflet)
+library(shinyBS)
 ###############################################.
 ## Functions ----
 ###############################################.  
@@ -38,13 +39,13 @@ library(leaflet)
 
 setwd("/conf/LIST_analytics/West Hub/02 - Scaled Up Work/COVID-19/HSCP Portal_Dashboard/UC_HSCP app/HSCP_Portal/")
 source_list <- list("A&E Attendances" = "A&E", 
-                              "NHS24 Calls" = "NHS24",
-                              "GP OOH Attendances" = "OOH",
-                              "Scottish Ambulance Services" = "SAS")
+                              "NHS24 Records" = "NHS24",
+                              "GP OOH Cases" = "OOH",
+                              "Scottish Ambulance Service Records" = "SAS")
 
 measure_list <- list("Total cases" = "cases",
                      "Rate (per 1,000 population)" = "rate",
-                     "Yearly change (%)" = "change")
+                     "Annual change (%)" = "change")
 
 ##########    Generic data files which include app date limits, location lookups and population lookups ##########
 

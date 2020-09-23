@@ -38,12 +38,17 @@ shinyUI(
                                      sliderInput("timeframesummary", "Weeks", min = 18, max = 30, 
                                                  ticks = TRUE, step = 1,  value = c(18,30),
                                                  dragRange = TRUE),
-                                     radioButtons("select_indsummary", "Measure",  choices = measure_list, selected = "cases")),
+                                     # tooltip when hovering over input menu
+                                     bsTooltip("timeframesummary", "Week 18: 29/04/19 & 27/04/20",
+                                               "right", options = list(container = "body")),
+                                     radioButtons("select_indsummary", "Measure",  choices = measure_list, selected = "cases"),
+                                     bsTooltip("select_indsummary", "Total cases: Number of cases per week<br/> Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
+                                               "right", options = list(container = "body"))),
                         mainPanel( box(width = 12, 
-                          infoBox("A&E (weekly average)", value=htmlOutput("aebox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("A&E cases (weekly average)", value=htmlOutput("aebox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
                          # infoBox("Non-Elective", paste(90, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("SAS (weekly average)", value=htmlOutput("sasbox"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("GP OOH (weekly average)", value=htmlOutput("oohbox"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("SAS cases (weekly average)", value=htmlOutput("sasbox"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("GP OOH cases (weekly average)", value=htmlOutput("oohbox"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("NHS24 records (weekly average)", value=htmlOutput("nhs24box"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple")),
 
                           box(plotlyOutput("sc1"), width = 9),
@@ -61,9 +66,6 @@ shinyUI(
                           box(plotlyOutput("sc4"), width = 9),
                           br(),
                           box(textOutput("text4"),  width = 3)
-                          
-                          
-                          
                         )
                       )),
              
@@ -73,7 +75,7 @@ shinyUI(
              sidebarPanel(
                selectInput("selectHSCP", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
                hr(),
-               selectInput("select_service", label = "Indicator", choices = source_list,
+               selectInput("select_service", label = "Service", choices = source_list,
                            selected = "NHS24"),
                radioButtons("select_ind", "Measure",  choices = measure_list, selected = "cases"),
                sliderInput("timeframe", "Weeks", min = 18, max = 30, 
@@ -110,10 +112,10 @@ shinyUI(
   tabPanel("Create Report",
            inputPanel(
              selectInput("selectHSCPrmd", "Select HSCP", choices = unique(iz$hscp), selected = "Glasgow City"),
-             checkboxGroupInput("select_service_rmd", label = "Indicator", 
+             checkboxGroupInput("select_service_rmd", label = "Service", 
                                 choices = source_list,
                                 selected = "A&E"),
-             radioButtons("select_ind_rmd", "Number of Cases/Rate (per 1,000 population)",  choices = measure_list, selected = "cases"),
+             radioButtons("select_ind_rmd", "Measure",  choices = measure_list, selected = "cases"),
              sliderInput("timeframe_rmd", "Weeks", min = 18, max = 30, 
                          ticks = TRUE, step = 1,  value = c(18,30),
                          dragRange = TRUE),
@@ -139,8 +141,6 @@ shinyUI(
            ### Add info about Portal
            h3("HSCP Portal Concept Dashboard - Notes", style = "text-align:left;"),
            hr(),
-           p("This tab will show information regarding the timeliness of the data as well as important details around it", style = "text-align:left;"),
-           br(),
            strong(p("NHS24 Records", style = "text-align:left;")),
            p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
            br(),
