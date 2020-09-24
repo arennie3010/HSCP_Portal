@@ -19,7 +19,7 @@ shinyUI(
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
                       hr(),
-                      p("This concept dashboard showcases data visualisation tools through Shiny to explore Unscheduled Care data.", style = "text-align:center;"),
+                      p("This dashboard contains a number of visualisations highlighting the service usage of Unscheduled Care Services across Scotland with focus on small area analysis.", style = "text-align:center;"),
                       br(),
                       strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer'.", style = "text-align:center;"),
                       br()),
@@ -141,19 +141,22 @@ shinyUI(
            ### Add info about Portal
            h3("HSCP Portal Concept Dashboard - Notes", style = "text-align:left;"),
            hr(),
+           strong(p("Background", style = "text-align:left;")),
+           p("This dashboard is designed to provide an insight to the service usage of a number of unscheduled care services.
+             The three main measures include total number, rate per 1,000 population and annual change from the previous year.
+             The figures are aggregated to weekly totals, at Intermediate Zone and HSCP level across Scotland.", style = "text-align:left;"),
            strong(p("NHS24 Records", style = "text-align:left;")),
-           p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
+           p("Source: All data presented here is extracted from the Unscheduled Care datamart in Public Health Scotland.", style = "text-align:left;"),
            br(),
            strong(p("GP Out of Hours Records", style = "text-align:left;")),
-           p("The statistics included cover patients attending Out of Hours (OOH) Primary Care services. Patients attend these services when their registered GP Practices are closed and they need urgent care.", style = "text-align:left;"),
-           p("A single case may be made up of multiple consultations.", style = "text-align:left;"),
+           p("Source: All data presented here is extracted from the Out of Hours datamart (OOH). Data is recorded locally on a system called ADASTRA, which routinely hosts all OOH activity, and submitted daily to Public Health Scotland.", style = "text-align:left;"),
            br(),
-           strong(p("Scottish Ambulance Service Records", style = "text-align:left;")),
-           p("*insert defintiion of NHS24 records included*", style = "text-align:left;"),
+           strong(p("Source: Scottish Ambulance Service Records", style = "text-align:left;")),
+           p("All data presented here is extracted from the Unscheduled Care Datamart in Public Health Scotland. Scottish Ambulance Service data in the UCD includes incidents where a vehicle arrived on the scene of the incident,
+             excluding data from resources which were cleared with a reason of 'dealt with by another vehicle' and air ambulance data. Scottish Ambulance Service provide an upload to the datamart each morning reflecting activity for two days previous.", style = "text-align:left;"),
            br(),
-           strong(p("Accident and Emergency Admission Records", style = "text-align:left;")),
-           p(" The statistics included cover attendances to all A&E services and are derived from the A&E datamart which includes more detailed information.", style = "text-align:left;"),
-           p("Includes ED and MIU attendances only, does not include Assessent Unit attendances.", style = "text-align:left;")
+           strong(p("Source: Accident and Emergency Admission Records", style = "text-align:left;")),
+           p("All data presented here is extracted from the A&E Data Mart in Public Health Scotland.", style = "text-align:left;")
 )
   
   
