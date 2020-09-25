@@ -12,17 +12,15 @@ shinyUI(
             #     id = "img-id",
             #     img(src = "MicrosoftTeams-image.png")
             #   )),
-
-             
-             
              tabPanel("About",
                       ### Add info about Portal
                       h3("HSCP Portal Concept Dashboard", style = "text-align:center;"),
                       hr(),
-                      p("This dashboard contains a number of visualisations highlighting the service usage of Unscheduled Care Services across Scotland with focus on small area analysis.", style = "text-align:center;"),
+                      p("This dashboard contains a number of visualisations highlighting the weekly usage of Unscheduled Care Services across Scotland with focus on small area localities.", style = "text-align:center;"),
                       br(),
-                      strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer'.", style = "text-align:center;"),
-                      br()),
+                      strong(p("To see HSCP level information, select 'Summary' in the Navigation Bar. To see Intermediate Zone information, select 'Data Explorer'.
+                               For more information regarding the data, select 'Notes'.", style = "text-align:center;")),
+                      br(),
                       img(src='MicrosoftTeams-image.png', style="display: block; margin-left: auto; margin-right: auto;")),
              
              ### SUMMARY TAB
@@ -45,11 +43,11 @@ shinyUI(
                                      bsTooltip("select_indsummary", "Total cases: Number of cases per week<br/> Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
                                                "right", options = list(container = "body"))),
                         mainPanel( box(width = 12, 
-                          infoBox("A&E cases (weekly average)", value=htmlOutput("aebox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("A&E Cases (weekly average)", value=htmlOutput("aebox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
                          # infoBox("Non-Elective", paste(90, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("SAS cases (weekly average)", value=htmlOutput("sasbox"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("GP OOH cases (weekly average)", value=htmlOutput("oohbox"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
-                          infoBox("NHS24 records (weekly average)", value=htmlOutput("nhs24box"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple")),
+                          infoBox("SAS Records (weekly average)", value=htmlOutput("sasbox"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("GP OOH Cases (weekly average)", value=htmlOutput("oohbox"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("NHS24 Records (weekly average)", value=htmlOutput("nhs24box"), icon=icon("phone", lib = "font-awesome"), fill = TRUE, color = "purple")),
 
                           box(plotlyOutput("sc1"), width = 9),
                           br(),
@@ -142,21 +140,25 @@ shinyUI(
            h3("HSCP Portal Concept Dashboard - Notes", style = "text-align:left;"),
            hr(),
            strong(p("Background", style = "text-align:left;")),
-           p("This dashboard is designed to provide an insight to the service usage of a number of unscheduled care services.
+           p("This dashboard is designed to provide an insight to the usage of a number of unscheduled care services.
              The three main measures include total number, rate per 1,000 population and annual change from the previous year.
-             The figures are aggregated to weekly totals, at Intermediate Zone and HSCP level across Scotland.", style = "text-align:left;"),
+             The figures are aggregated to weekly totals, at Intermediate Zone and HSCP level for NHS Scotland.", style = "text-align:left;"),
            strong(p("NHS24 Records", style = "text-align:left;")),
            p("Source: All data presented here is extracted from the Unscheduled Care datamart in Public Health Scotland.", style = "text-align:left;"),
            br(),
            strong(p("GP Out of Hours Records", style = "text-align:left;")),
            p("Source: All data presented here is extracted from the Out of Hours datamart (OOH). Data is recorded locally on a system called ADASTRA, which routinely hosts all OOH activity, and submitted daily to Public Health Scotland.", style = "text-align:left;"),
            br(),
-           strong(p("Source: Scottish Ambulance Service Records", style = "text-align:left;")),
-           p("All data presented here is extracted from the Unscheduled Care Datamart in Public Health Scotland. Scottish Ambulance Service data in the UCD includes incidents where a vehicle arrived on the scene of the incident,
+           strong(p("Scottish Ambulance Service Records", style = "text-align:left;")),
+           p("Source: All data presented here is extracted from the Unscheduled Care Datamart in Public Health Scotland. Scottish Ambulance Service data in the UCD includes incidents where a vehicle arrived on the scene of the incident,
              excluding data from resources which were cleared with a reason of 'dealt with by another vehicle' and air ambulance data. Scottish Ambulance Service provide an upload to the datamart each morning reflecting activity for two days previous.", style = "text-align:left;"),
            br(),
-           strong(p("Source: Accident and Emergency Admission Records", style = "text-align:left;")),
-           p("All data presented here is extracted from the A&E Data Mart in Public Health Scotland.", style = "text-align:left;")
+           strong(p("Accident and Emergency Admission Records", style = "text-align:left;")),
+           p("Source: All data presented here is extracted from the A&E Data Mart in Public Health Scotland.
+             Includes ED and MIU attendances only, does not include Assessent Unit attendances.", style = "text-align:left;"),
+           br(),
+           strong(p("Emergency Admissions", style = "text-align:left;")),
+           p("Source: All data presented here is extracted from the ...", style = "text-align:left;")
 )
   
   
