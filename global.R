@@ -38,7 +38,7 @@ library(shinyBS)
 ## Data ----
 
 setwd("/conf/LIST_analytics/West Hub/02 - Scaled Up Work/COVID-19/HSCP Portal_Dashboard/UC_HSCP app/HSCP_Portal/")
-source_list <- list("A&E Attendances" = "A&E", 
+source_list <- list("A&E Cases" = "A&E", 
                               "NHS24 Records" = "NHS24",
                               "GP OOH Cases" = "OOH",
                               "Scottish Ambulance Service Records" = "SAS")
@@ -61,6 +61,7 @@ iz_bounds <- readRDS("data/IZ_boundary_test.rds")
 ## Data
 iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
 hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
+hscp$year <- as.factor(hscp$year)
 
 
 ##### Location lookup #####

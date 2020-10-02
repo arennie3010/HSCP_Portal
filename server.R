@@ -123,8 +123,10 @@ shinyServer(function(input, output, session) {
              week %in% input$timeframesummary[1]:input$timeframesummary[2],
              ind == input$select_indsummary) %>%
       mutate(text = paste0("HSCP: ", hscp, "\n", 
-                           "Week: ", week, "\n", 
-                           "Rate: ",round_half_up(value,1)))
+                           "Year: ", year, "\n",
+                           "Month: ", month, "\n",
+                           "Week: ", week, "\n",
+                           "Value: ",round_half_up(value,1)))
     
   })
   
@@ -132,11 +134,7 @@ shinyServer(function(input, output, session) {
     
     
   })
-  
-
-    
-
-
+ 
 info_data <- reactive({
   hscp %>%
     filter(hscp == input$selectHSCPsummary,
@@ -162,13 +160,12 @@ output$sc1 <- renderPlotly({
   
   
     ggplotly(ggplot(subset(selected_summary_data(), source == "OOH"), aes(week, value)) +
-    geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
-    theme_classic()  +
+    geom_line(aes(text = text, colour = year, group = year), size = 1.4) +
+    theme_minimal()  +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
-    labs(title = "GP OOH Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
-         caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
-    config(displayModeBar = FALSE) 
+    labs(title = "GP OOH Cases", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
+    config(displayModeBar = FALSE)
  
 })
 
@@ -177,12 +174,12 @@ output$text1 <- renderText({"Chart commentary for GP OOH chart which will be aut
 output$sc2 <- renderPlotly({
   
   ggplotly(ggplot(subset(selected_summary_data(), source == "A&E"), aes(week, value)) +
-    geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
-    theme_classic()  +
+    geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
+    theme_minimal()  +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "A&E Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
-         caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
+         caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
     config(displayModeBar = FALSE)
 })
 
@@ -191,12 +188,12 @@ output$text2 <- renderText({"Chart commentary for A&E chart which will be automa
 output$sc3 <- renderPlotly({
   
   ggplotly(ggplot(subset(selected_summary_data(), source == "NHS24"), aes(week, value)) +
-    geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
-    theme_classic() +
+    geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
+    theme_minimal() +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
-         caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
+         caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
     config(displayModeBar = FALSE)
 })
   output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
@@ -204,12 +201,12 @@ output$sc3 <- renderPlotly({
   output$sc4 <- renderPlotly({
     
     ggplotly(ggplot(subset(selected_summary_data(), source == "SAS"), aes(week, value)) +
-               geom_line(aes(group = year, colour = factor(year)), size = 1.4) +
-               theme_classic()  +
+               geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
+               theme_minimal()  +
                theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
                scale_color_manual(values=c("mediumpurple1", "#43358b")) +
                labs(title = "SAS Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
-                    caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary))) %>%
+                    caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
       config(displayModeBar = FALSE)
   })
   
