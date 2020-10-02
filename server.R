@@ -161,7 +161,7 @@ output$sc1 <- renderPlotly({
   
     ggplotly(ggplot(subset(selected_summary_data(), source == "OOH"), aes(week, value)) +
     geom_line(aes(text = text, colour = year, group = year), size = 1.4) +
-    theme_minimal()  +
+    theme_light()  +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "GP OOH Cases", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
@@ -175,7 +175,7 @@ output$sc2 <- renderPlotly({
   
   ggplotly(ggplot(subset(selected_summary_data(), source == "A&E"), aes(week, value)) +
     geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
-    theme_minimal()  +
+    theme_light()  +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "A&E Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
@@ -189,7 +189,7 @@ output$sc3 <- renderPlotly({
   
   ggplotly(ggplot(subset(selected_summary_data(), source == "NHS24"), aes(week, value)) +
     geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
-    theme_minimal() +
+    theme_light() +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
     labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
@@ -202,7 +202,7 @@ output$sc3 <- renderPlotly({
     
     ggplotly(ggplot(subset(selected_summary_data(), source == "SAS"), aes(week, value)) +
                geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
-               theme_minimal()  +
+               theme_light()  +
                theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
                scale_color_manual(values=c("mediumpurple1", "#43358b")) +
                labs(title = "SAS Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
