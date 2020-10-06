@@ -39,6 +39,7 @@ library(shinyBS)
 
 setwd("/conf/LIST_analytics/West Hub/02 - Scaled Up Work/COVID-19/HSCP Portal_Dashboard/UC_HSCP app/HSCP_Portal/")
 source_list <- list("A&E Cases" = "A&E", 
+                    "Emergency Admissions" = "EA",
                               "NHS24 Records" = "NHS24",
                               "GP OOH Cases" = "OOH",
                               "Scottish Ambulance Service Records" = "SAS")

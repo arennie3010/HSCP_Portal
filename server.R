@@ -163,6 +163,7 @@ info_data <- reactive({
   
 #infoboxes 
 output$aebox <- renderText({as.character(info_data() %>% filter(source == "A&E") %>% select(value))})
+output$eabox <- renderText({as.character(info_data() %>% filter(source == "EA") %>% select(value))})
 output$oohbox <- renderText({as.character(info_data() %>% filter(source == "OOH") %>% select(value))})
 output$nhs24box <- renderText({as.character(info_data() %>% filter(source == "NHS24") %>% select(value))})
 output$sasbox <- renderText({as.character(info_data() %>% filter(source == "SAS") %>% select(value))})
@@ -227,7 +228,20 @@ output$sc3 <- renderPlotly({
   
   output$text4 <- renderText({"Chart commentary for SAS chart which will be automated via RMarkdown."})
   
-
+  
+  output$sc5 <- renderPlotly({
+    
+    ggplotly(ggplot(subset(selected_summary_data(), source == "EA"), aes(week, value)) +
+               geom_line(aes(text = text, group = year, colour = year), size = 1.4) +
+               theme_light()  +
+               theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
+               scale_color_manual(values=c("mediumpurple1", "#43358b")) +
+               labs(title = "EA Cases", subtitle = paste("Weeks",isoweek(ymd(input$timeframesummary[1])),"to",isoweek(ymd(input$timeframesummary[2]))),
+                    caption = "Data source: RAPID datamart", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
+      config(displayModeBar = FALSE)
+  })
+  
+  output$text5 <- renderText({"Chart commentary for Emergency Admissions chart which will be automated via RMarkdown."})
 
 
 
@@ -305,6 +319,20 @@ P4_RMD <- reactive({
 
 output$sas_plot_rmd <- renderPlot({
   P4_RMD()
+})
+
+P5_RMD <- reactive({
+  if("SAS" %in% input$select_service_rmd){
+    selected_report_data() %>% filter(source == "EA") %>%
+      ggplot(aes(x= week, y = value)) +
+      geom_line(alpha = 0.7, colour = "#43358b", size = 1.5) +
+      theme_minimal() +
+      labs(x = "Week of the Year", paste("Difference in", input$select_ind_rmd, "from 2019"),
+           title = paste("EA", input$select_ind_rmd, "in 2020 by week"))}else{}
+})
+
+output$sas_plot_rmd <- renderPlot({
+  P5_RMD()
 })
 # observeEvent(input$RMD, {
 #   rmarkdown::render(input = "RMarkdown script.Rmd")

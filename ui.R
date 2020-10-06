@@ -49,6 +49,7 @@ shinyUI(
                                      ),
                         mainPanel( box(width = 12, 
                           infoBox("A&E Cases (weekly average)", value=htmlOutput("aebox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
+                          infoBox("Emergency Admissions (weekly average)", value=htmlOutput("eabox"), icon=icon("user-injured", lib = "font-awesome"), fill = TRUE, color = "purple"),
                          # infoBox("Non-Elective", paste(90, "cases"), icon=icon("hospital", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("SAS Records (weekly average)", value=htmlOutput("sasbox"), icon=icon("ambulance", lib = "font-awesome"), fill = TRUE, color = "purple"),
                           infoBox("GP OOH Cases (weekly average)", value=htmlOutput("oohbox"), icon=icon("clock", lib = "font-awesome"), fill = TRUE, color = "purple"),
@@ -68,7 +69,8 @@ shinyUI(
                           br(),
                           box(plotlyOutput("sc4"), width = 9),
                           br(),
-                          box(textOutput("text4"),  width = 3)
+                          box(textOutput("text5"),  width = 3),
+                          box(plotlyOutput("sc5"), width = 9)
                         )
                       )),
              
