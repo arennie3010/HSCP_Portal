@@ -58,6 +58,9 @@ end_date <- as.Date("30-06-2020", format = "%d-%m-%Y")
 iz_bounds <- readRDS("data/IZ_boundary_test.rds")
 
 
+## IZ Populations
+int_pops <- read.csv("data/IntermediateZonePopulations_2019.csv")
+
 ## Data
 iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
 hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
@@ -129,11 +132,26 @@ d1 <- read.csv('data/UCdata-day.csv') %>%
   # rename(covid_cases = "number_of_nhs_24_records_5") %>%
   # mutate(date = as.Date(date))
 
+# Tooltip text
 
+# Summary
 
+measure_tooltip_s <- bsTooltip("select_indsummary", "Total cases: Number of cases per week<br/>
+                               Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
+                             "right", options = list(container = "body"))
+time_tooltip_s <- bsTooltip("timeframesummary", "Week 14 beginning 1 Apr 2019 & 30 Mar 2020", options = list(container = "body"))
 
+loc_tooltip_s <- bsTooltip("selectHSCPsummary", "Select Health and Social Care Partnership", options = list(container = "body"))
 
+# Data explorer
 
+measure_tooltip_d <- bsTooltip("select_ind", "Total cases: Number of cases per week<br/> Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
+                             "right", options = list(container = "body"))
+time_tooltip_d <- bsTooltip("timeframe", "Week 14 beginning 1 Apr 2019 & 30 Mar 2020.<br/> To see weekly transitions, move slider to one week period and click the play icon.", options = list(container = "body"))
+
+loc_tooltip_d <- bsTooltip("selectHSCP", "Select Health and Social Care Partnership", options = list(container = "body"))
+
+service_tooltip_d <- bsTooltip("select_service", "Select unscheduled care service from drop down", options = list(container = "body"))
 
 
 ## END

@@ -25,7 +25,7 @@ shinyServer(function(input, output, session) {
       filter(hscp == input$selectHSCP,
              source == input$select_service,
              year == 2020,
-             week %in% input$timeframe[1]:input$timeframe[2],
+             week %in% isoweek(ymd(input$timeframe[1])):isoweek(ymd(input$timeframe[2])),
              ind == input$select_ind) %>%
       # create percentiles for heatchart fill
       mutate(tile_rank = ntile(value,20)) %>%
@@ -42,15 +42,23 @@ shinyServer(function(input, output, session) {
       ungroup() %>%
       # Create percentiles for the colours being used
       mutate(tile_rank = ntile(value,10)) %>%
+      rename(area_name = intzone) %>%
+      left_join(distinct(select(iz_bounds@data, area_name, code)), by = "area_name") %>%
+      left_join(int_pops, by = "code") %>%
       #
-      mutate(text = paste0("Interzone: ", intzone, " \n", 
-                           "Weeks: ", input$timeframe[1], " to ", input$timeframe[2], " \n", 
+      mutate(text = paste0("InterZone Code: ", code, " <br/>", 
+                           "InterZone Name: ", area_name, "<br/>", 
+                           "InterZone Population:",format(pop, big.mark = ","), "<br/>",
+                           "Weeks: ", isoweek(ymd(input$timeframe[1])), 
+                           " to ", 
+                           isoweek(ymd(input$timeframe[2])), " ", 
+                           "<i>(WB:", input$timeframe[1], "- WB:",
+                           input$timeframe[2], ")</i><br/>",
                            #
-                           "Mean Weekly ", input$select_ind,": ", round_half_up(value,1))) %>%
-      rename(area_name = intzone)
+                           "Weekly average ", input$select_ind,": ", round_half_up(value,1)))
     
     sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
-          merge_dat, by = "area_name")
+          merge_dat, by = c("area_name", "code"))
   })
   
   ## MAP
@@ -59,20 +67,26 @@ shinyServer(function(input, output, session) {
       
     pal <- colorNumeric(
       palette = colorRampPalette(c("#FFFFB7","#FF9100","red"), bias = 2.5)(length(map_dat()$area_name)), 
-      domain = c(min(map_dat()$tile_rank):max(map_dat()$tile_rank)))
+      domain = c(min(map_dat()$value):max(map_dat()$value + 1)))
+    
+    legend_title <- paste(case_when(input$select_ind == "cases" ~ "Weekly average cases",
+                                    input$select_ind == "rate" ~ "Weekly average rate <br>(per 1,000 population)",
+                                    input$select_ind == "change" ~ "Percent annual change"))
+
     
     leaflet() %>% 
       addProviderTiles(providers$CartoDB.Positron) %>%
       addPolygons(data=map_dat(),
                   color = "#444444", weight = 2, smoothFactor = 0.5,
                   #tooltip
-                  label = (map_dat()$text),
-                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(map_dat()$tile_rank), #Colours
+                  label = lapply(map_dat()$text, htmltools::HTML),
+                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(map_dat()$value), #Colours
                   highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                      bringToFront = TRUE)
-      )
+                                                      bringToFront = TRUE)) %>%
+                  addLegend(pal = pal, values = map_dat()$value, title = HTML(legend_title))
       
   })
+  
   
   ## HEATCHART
   output$heatchart_iz <- renderPlot(
@@ -82,14 +96,15 @@ shinyServer(function(input, output, session) {
     {
     
 
-    ggplot(selected_IZ_data(), aes(week, intzone, fill= tile_rank, text=text)) + 
+    ggplot(selected_IZ_data(), aes(factor(week, levels = isoweek(ymd(input$timeframe[1])):isoweek(ymd(input$timeframe[2]))), 
+                                   intzone, fill= tile_rank, text=text)) + 
                 scale_y_discrete(limits = unique(rev(selected_IZ_data()$intzone))) + # reverses y axis - alphabetical from top
                 geom_tile(aes(fill = tile_rank)) +
                 geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4.5) +
                 labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Weekly ", 
                                   names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
                      x="Week", y="") + 
-                scale_x_discrete(position = "top", limits = input$timeframesummary[1]:input$timeframesummary[2]) +
+        scale_x_discrete(position = "top") +
         # Can choose different colour scales if required
                 #scale_fill_viridis_c(option = "C") +
                 scale_fill_continuous(low = "#FFFFB7",
@@ -120,7 +135,7 @@ shinyServer(function(input, output, session) {
     
     hscp %>%
       filter(hscp == input$selectHSCPsummary,
-             week %in% input$timeframesummary[1]:input$timeframesummary[2],
+             week %in% isoweek(ymd(input$timeframesummary[1])):isoweek(ymd(input$timeframesummary[2])),
              ind == input$select_indsummary) %>%
       mutate(text = paste0("HSCP: ", hscp, "\n", 
                            "Year: ", year, "\n",
@@ -138,7 +153,7 @@ shinyServer(function(input, output, session) {
 info_data <- reactive({
   hscp %>%
     filter(hscp == input$selectHSCPsummary,
-           week %in% input$timeframesummary[1]:input$timeframesummary[2],
+           week %in% isoweek(ymd(input$timeframesummary[1])):isoweek(ymd(input$timeframesummary[2])),
            ind == input$select_indsummary) %>%
     group_by(source) %>%
     summarise(value = format(round(mean(value),0),big.mark=",")) %>%
@@ -178,7 +193,7 @@ output$sc2 <- renderPlotly({
     theme_light()  +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
-    labs(title = "A&E Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
+    labs(title = "A&E Cases", subtitle = paste("Weeks",isoweek(ymd(input$timeframesummary[1])),"to",isoweek(ymd(input$timeframesummary[2]))),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
     config(displayModeBar = FALSE)
 })
@@ -192,7 +207,7 @@ output$sc3 <- renderPlotly({
     theme_light() +
       theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
       scale_color_manual(values=c("mediumpurple1", "#43358b")) +
-    labs(title = "NHS24 Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
+    labs(title = "NHS24 Cases", subtitle = paste("Weeks",isoweek(ymd(input$timeframesummary[1])),"to",isoweek(ymd(input$timeframesummary[2]))),
          caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
     config(displayModeBar = FALSE)
 })
@@ -205,7 +220,7 @@ output$sc3 <- renderPlotly({
                theme_light()  +
                theme(legend.title = element_blank(), plot.title = element_text(face = "bold", hjust = 0.5)) +
                scale_color_manual(values=c("mediumpurple1", "#43358b")) +
-               labs(title = "SAS Cases", subtitle = paste("Weeks",input$timeframesummary[1],"to",input$timeframesummary[2]),
+               labs(title = "SAS Cases", subtitle = paste("Weeks",isoweek(ymd(input$timeframesummary[1])),"to",isoweek(ymd(input$timeframesummary[2]))),
                     caption = "Data source: Unscheduled Care database", x = "Week", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
       config(displayModeBar = FALSE)
   })
@@ -221,7 +236,7 @@ selected_report_data <- reactive({
   
   hscp %>%
     filter(hscp == input$selectHSCPrmd,
-           week %in% input$timeframe_rmd[1]:input$timeframe_rmd[2],
+           week %in% isoweek(ymd(input$timeframe_rmd[1])):isoweek(ymd(input$timeframe_rmd[2])),
            ind == input$select_ind_rmd,
            source %in% input$select_service_rmd)
   
