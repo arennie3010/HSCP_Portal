@@ -52,7 +52,7 @@ measure_list <- list("Total cases" = "cases",
 
 ##### Date limits #####
 start_date <- as.Date("01-03-2020", format = "%d-%m-%Y")
-end_date <- as.Date("30-06-2020", format = "%d-%m-%Y")
+end_date <- as.Date("28-06-2020", format = "%d-%m-%Y")
 
 
 ## IZ Boundaries
@@ -63,8 +63,11 @@ iz_bounds <- readRDS("data/IZ_boundary_test.rds")
 int_pops <- read.csv("data/IntermediateZonePopulations_2019.csv")
 
 ## Data
-iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
-hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
+#iz <- read.csv("data/2020_data/UCdata-week-iz.csv")
+iz <- readRDS("data/extract.UC.IZ.rds")
+
+#hscp <- read.csv("data/2020_data/UCdata-week-hscp.csv")
+hscp <- readRDS("data/extract.UC.HSCP.rds")
 hscp$year <- as.factor(hscp$year)
 
 

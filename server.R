@@ -322,7 +322,7 @@ output$sas_plot_rmd <- renderPlot({
 })
 
 P5_RMD <- reactive({
-  if("SAS" %in% input$select_service_rmd){
+  if("EA" %in% input$select_service_rmd){
     selected_report_data() %>% filter(source == "EA") %>%
       ggplot(aes(x= week, y = value)) +
       geom_line(alpha = 0.7, colour = "#43358b", size = 1.5) +
@@ -331,7 +331,7 @@ P5_RMD <- reactive({
            title = paste("EA", input$select_ind_rmd, "in 2020 by week"))}else{}
 })
 
-output$sas_plot_rmd <- renderPlot({
+output$ea_plot_rmd <- renderPlot({
   P5_RMD()
 })
 # observeEvent(input$RMD, {
