@@ -56,7 +56,7 @@ end_date <- as.Date("28-06-2020", format = "%d-%m-%Y")
 
 
 ## IZ Boundaries
-iz_bounds <- readRDS("data/IZ_boundary_test.rds")
+iz_bounds <- readRDS("data/IZ_boundary.rds")
 
 
 ## IZ Populations
@@ -128,8 +128,8 @@ hscp$year <- as.factor(hscp$year)
 
 ##### Data build - daily data used ofr UC Impact Dashboard - includes Nnhs24, ecoss, gp ooh, sas, ae, ea data #####
 
-d1 <- read.csv('data/UCdata-day.csv') %>%
-  clean_names() #%>%
+#d1 <- read.csv('data/UCdata-day.csv') %>%
+#  clean_names() #%>%
   # rename(hb = "reporting_health_board_name_current") %>%
   # rename(date = "nhs_24_call_rcvd_date") %>%
   # rename(total_cases = "number_of_nhs_24_records_4") %>%

@@ -74,7 +74,7 @@ shinyUI(
                         )
                       )),
              
-             ### MAIN DATA EXPLORE TAB
+        ### MAIN DATA EXPLORE TAB
   tabPanel("Data Explorer",
   fluidPage(
              sidebarPanel(

@@ -170,7 +170,10 @@ output$sasbox <- renderText({as.character(info_data() %>% filter(source == "SAS"
 
 
 
-# CHART ! - SUMMARY
+
+
+
+
 output$sc1 <- renderPlotly({
   
   
@@ -185,7 +188,8 @@ output$sc1 <- renderPlotly({
  
 })
 
-output$text1 <- renderText({"Chart commentary for GP OOH chart which will be automated via RMarkdown."})
+output$text1 <- renderText({paste0("This chart shows the change in GP out of hours service usage from week beginning ", input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
+                                  "\n",  "There has been an *increase/decrease* in ", input$select_indsummary, " for GP OOH cases in ", input$selectHSCPsummary)})
 
 output$sc2 <- renderPlotly({
   
