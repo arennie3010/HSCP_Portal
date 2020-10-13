@@ -70,6 +70,11 @@ iz <- readRDS("data/extract.UC.IZ.rds")
 hscp <- readRDS("data/extract.UC.HSCP.rds")
 hscp$year <- as.factor(hscp$year)
 
+###########  Monthly data sets ##########################
+iz.m <- readRDS("data/extract.UC.IZ.M.rds")
+hscp.m <- readRDS("data/extract.UC.HSCP.M.rds")
+hscp.m$year <- as.factor(hscp.m$year)
+
 
 ##### Location lookup #####
 # read in postcode directory file to establish lat & long of patients 
@@ -140,18 +145,18 @@ hscp$year <- as.factor(hscp$year)
 
 # Summary
 
-measure_tooltip_s <- bsTooltip("select_indsummary", "Total cases: Number of cases per week<br/>
+measure_tooltip_s <- bsTooltip("select_indsummary", "Total cases: Number of cases per month<br/>
                                Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
                              "right", options = list(container = "body"))
-time_tooltip_s <- bsTooltip("timeframesummary", "Week 14 beginning 1 Apr 2019 & 30 Mar 2020", options = list(container = "body"))
+time_tooltip_s <- bsTooltip("timeframesummary", "March to July", options = list(container = "body"))
 
 loc_tooltip_s <- bsTooltip("selectHSCPsummary", "Select Health and Social Care Partnership", options = list(container = "body"))
 
 # Data explorer
 
-measure_tooltip_d <- bsTooltip("select_ind", "Total cases: Number of cases per week<br/> Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
+measure_tooltip_d <- bsTooltip("select_ind", "Total cases: Number of cases per month<br/> Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
                              "right", options = list(container = "body"))
-time_tooltip_d <- bsTooltip("timeframe", "Week 14 beginning 1 Apr 2019 & 30 Mar 2020.<br/> To see weekly transitions, move slider to one week period and click the play icon.", options = list(container = "body"))
+time_tooltip_d <- bsTooltip("timeframe", "Months March to July.<br/> To see monthly transitions, move slider to one month period.", options = list(container = "body"))
 
 loc_tooltip_d <- bsTooltip("selectHSCP", "Select Health and Social Care Partnership", options = list(container = "body"))
 
