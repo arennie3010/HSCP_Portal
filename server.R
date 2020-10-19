@@ -49,9 +49,9 @@ shinyServer(function(input, output, session) {
       mutate(text = paste0("InterZone Code: ", code, " <br/>", 
                            "InterZone Name: ", area_name, "<br/>", 
                            "InterZone Population:",format(pop, big.mark = ","), "<br/>",
-                           "Months: ", month(ymd(input$timeframe[1])), 
+                           "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE), 
                            " to ", 
-                           month(ymd(input$timeframe[2])), " ", 
+                           month(input$timeframe[2], label = TRUE, abbr = FALSE), " ", 
                            "<i>(MB:", input$timeframe[1], "- MB:",
                            input$timeframe[2], ")</i><br/>",
                            #
