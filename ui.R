@@ -109,7 +109,7 @@ shinyUI(
              mainPanel(
              tabsetPanel(type = "tabs",
                          tabPanel("Map",
-                                  leafletOutput("map_iz", height = "80vh")),
+                                  leafletOutput("map_pois", height = "80vh")), #### changeleaflet output to "map_iz" to revert to old map - in testing at the moment
                          tabPanel("Heatchart",
                                   plotOutput("heatchart_iz", height = 800)
                                   # tags$div("Loading...", id = "loadmessage"),

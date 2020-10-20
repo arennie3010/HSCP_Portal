@@ -76,7 +76,7 @@ hscp.m <- readRDS("data/extract.UC.HSCP.M.rds")
 hscp.m$year <- as.factor(hscp.m$year)
 
 ####################### load in data set with possion exact intervals ###########################################
-poisson.iz <- readRDS("data/pois_dt.rds")
+pois_dt <- readRDS("data/pois_dt.rds")
 
 r.m = 1000
 alpha = 0.02
