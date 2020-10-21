@@ -127,13 +127,12 @@ shinyServer(function(input, output, session) {
       mutate(text = paste0("InterZone Code: ", code, " <br/>", 
                            "InterZone Name: ", area_name, "<br/>", 
                            "InterZone Population:",format(pop, big.mark = ","), "<br/>",
-                           "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE), 
-                           " to ", 
+                           "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE)," to ", 
                            month(input$timeframe[2], label = TRUE, abbr = FALSE), "</i><br/>",
-                           "Intermediate Zone rate: ", round(rate,0), "<br/>",
+                           "Intermediate Zone rate: ", round(rate,0), " per 1,000 population", "<br/>",
                             100*(1-alpha), "%", " Confidence Interval: ", round(rlow,0), " to ",  round(rup,0), "<br/>",
-                           "IZ compared to HSCP crude rate: ", rate_flag_name, "<br/>",
-                           "HSCP Crude Rate (Comparator): ",round(crude_hscp,0)))
+                           "IZ rate compared to HSCP rate: ", rate_flag_name, "<br/>",
+                           "HSCP rate (Comparator): ",round(crude_hscp,0)))
     
     
     sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
@@ -165,10 +164,66 @@ shinyServer(function(input, output, session) {
   
   
   ###################################################################
+  ###       HEATCHART WITH DIFFERENT COLOURS                     ###
+  
+ heatchart_dat <- reactive({
+    
+    pois_dt %>%
+      filter(hscp == input$selectHSCP,
+             source == input$select_service,
+             year == 2020,
+             month %in% input$timeframe[1]:input$timeframe[2]) %>%
+      group_by(hscp, intzone, month) %>%
+      summarise(population = first(population),
+                cases = sum(cases),
+                hscp_population = first(hscp_population),
+                hscp_cases = sum(hscp_cases)) %>%
+      mutate(rate = round(r.m*(cases/population),1)) %>%
+      mutate(olow = qchisq(p = 1-(alpha/2), df = 2*cases, lower.tail = FALSE)/2) %>%
+      mutate(oup = qchisq(p=alpha/2, df = (2*cases)+2, lower.tail = FALSE)/2) %>%
+      mutate(rlow = round(olow/population*r.m,1)) %>%
+      mutate(rup = round(oup/population*r.m,1)) %>%
+      mutate(crude_hscp = round(r.m*(hscp_cases/hscp_population)),1) %>%
+      mutate(rate_flag = ifelse(crude_hscp < rlow, 2,  # 2 = high, 0 = low, 1 = same
+                                ifelse(crude_hscp > rup, 0, # low
+                                       ifelse(crude_hscp <= rup & crude_hscp >= rlow, 1, NA)))) %>%
+      select(hscp, intzone, month, rate_flag, cases, rate, rlow, rup, crude_hscp) %>%
+      mutate(rate_flag_name = ifelse(rate_flag == 0, "low",  # 2 = high, 0 = low, 1 = same
+                                     ifelse(rate_flag == 1, "same",
+                                            ifelse(rate_flag == 2, "high", NA)))) 
+     
+  })
   
   
+  output$heatchart_pois <- renderPlot(
+    height = function () 800+10*length(unique(heatchart_dat()$intzone)),
+    
+    
+    {
+      
+      
+      ggplot(heatchart_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
+                                     intzone, fill= rate_flag)) + 
+        scale_y_discrete(limits = unique(rev(heatchart_dat()$intzone))) + # reverses y axis - alphabetical from top
+        geom_tile(aes(fill = rate_flag, opacity = 0.75)) +
+        geom_text(aes(label = format(round_half_up(rate,digits = 0), nsmall = 0)), size=4.5) +
+        labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
+                          names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
+             x="Month", y="") + 
+        scale_x_discrete(position = "top") +
+        # Can choose different colour scales if required
+        #scale_fill_viridis_c(option = "C") +
+        scale_fill_continuous(low = "blue",
+                              high = "orange") +
+        theme_grey(base_size = 16) + 
+        labs(fill = "Rate per\n1,000 population") +
+        theme(legend.position = "none",
+              plot.title = element_text(family="helvetica", face = "bold"))
+      
+    })
   
   
+  ################################
   
   ## HEATCHART
   output$heatchart_iz <- renderPlot(
