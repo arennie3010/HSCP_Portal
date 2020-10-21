@@ -101,39 +101,46 @@ shinyServer(function(input, output, session) {
                 cases = sum(cases),
                 hscp_population = first(hscp_population),
                 hscp_cases = sum(hscp_cases)) %>%
-      ungroup() %>%
-      mutate(rate = r.m*(cases/population)) %>%
-      mutate(olow = qchisq(p = (1-alpha)/2, df = 2*cases, lower.tail = FALSE)/2) %>%
+      mutate(rate = round(r.m*(cases/population),1)) %>%
+      mutate(olow = qchisq(p = 1-(alpha/2), df = 2*cases, lower.tail = FALSE)/2) %>%
       mutate(oup = qchisq(p=alpha/2, df = (2*cases)+2, lower.tail = FALSE)/2) %>%
-      mutate(rlow = olow/population*r.m) %>%
-      mutate(rup = oup/population*r.m) %>%
-      mutate(crude_hscp = r.m*(hscp_cases/hscp_population)) %>%
+      mutate(rlow = round(olow/population*r.m,1)) %>%
+      mutate(rup = round(oup/population*r.m,1)) %>%
+      mutate(crude_hscp = round(r.m*(hscp_cases/hscp_population)),1) %>%
       mutate(rate_flag = ifelse(crude_hscp < rlow, 2,  # 2 = high, 0 = low, 1 = same
-                                ifelse(crude_hscp > rup, 0,
+                                ifelse(crude_hscp > rup, 0, # low
                                        ifelse(crude_hscp <= rup & crude_hscp >= rlow, 1, NA)))) %>%
-      select(hscp, intzone, rate_flag, cases, rate) %>%
-      pivot_longer(cols = 3:5, names_to = "ind", values_to = "value") %>%
-      filter(ind == "rate_flag") %>%
+      select(hscp, intzone, rate_flag, cases, rate, rlow, rup, crude_hscp) %>%
+      mutate(rate_flag_name = ifelse(rate_flag == 0, "low",  # 2 = high, 0 = low, 1 = same
+                                     ifelse(rate_flag == 1, "same",
+                                            ifelse(rate_flag == 2, "high", NA))))
+  })
+  
+  
+  
+  map_dat <- reactive({
+   test_1 <- selected_IZ_data_pois() %>% 
+      # pivot_longer(cols = 3:5, names_to = "ind", values_to = "value") %>%
       rename(area_name = intzone) %>%
       left_join(distinct(select(iz_bounds@data, area_name, code)), by = "area_name") %>%
       left_join(int_pops, by = "code")  %>%
       mutate(text = paste0("InterZone Code: ", code, " <br/>", 
-                                                             "InterZone Name: ", area_name, "<br/>", 
-                                                             "InterZone Population:",format(pop, big.mark = ","), "<br/>",
-                                                             "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE), 
-                                                             " to ", 
-                                                             month(input$timeframe[2], label = TRUE, abbr = FALSE), " ", 
-                                                             "<i>(MB:", input$timeframe[1], "- MB:",
-                                                             input$timeframe[2], ")</i><br/>",
-                                                             #
-                                                              input$select_ind,": ", round_half_up(value,1)))
+                           "InterZone Name: ", area_name, "<br/>", 
+                           "InterZone Population:",format(pop, big.mark = ","), "<br/>",
+                           "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE), 
+                           " to ", 
+                           month(input$timeframe[2], label = TRUE, abbr = FALSE), "</i><br/>",
+                           "Intermediate Zone rate: ", round(rate,0), "<br/>",
+                            100*(1-alpha), "%", " Confidence Interval: ", round(rlow,0), " to ",  round(rup,0), "<br/>",
+                           "IZ compared to HSCP crude rate: ", rate_flag_name, "<br/>",
+                           "HSCP Crude Rate (Comparator): ",round(crude_hscp,0)))
     
     
     sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
-              test, by = c("area_name", "code"))
+              test_1, by = c("area_name", "code"))
   })
   
-  
+
   ## MAP
   output$map_pois <- renderLeaflet(
     {
@@ -145,15 +152,16 @@ shinyServer(function(input, output, session) {
       
       leaflet() %>% 
         addProviderTiles(providers$CartoDB.Positron) %>%
-        addPolygons(data=selected_IZ_data_pois(),
+        addPolygons(data=map_dat(),
                     color = "#444444", weight = 2, smoothFactor = 0.5,
                     #tooltip
-                    label = lapply(selected_IZ_data_pois()$text, htmltools::HTML),
-                    opacity = 1.0, fillOpacity = 0.75, fillColor = ~pal(selected_IZ_data_pois()$value), #Colours
+                    label = lapply(map_dat()$text, htmltools::HTML),
+                    opacity = 1.0, fillOpacity = 0.75, fillColor = ~pal(map_dat()$rate_flag), #Colours
                     highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                        bringToFront = TRUE)) 
+                                                        bringToFront = TRUE))
       
     })
+  
   
   
   ###################################################################
