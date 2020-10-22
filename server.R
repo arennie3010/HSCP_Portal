@@ -190,36 +190,42 @@ shinyServer(function(input, output, session) {
       select(hscp, intzone, month, rate_flag, cases, rate, rlow, rup, crude_hscp) %>%
       mutate(rate_flag_name = ifelse(rate_flag == 0, "low",  # 2 = high, 0 = low, 1 = same
                                      ifelse(rate_flag == 1, "same",
-                                            ifelse(rate_flag == 2, "high", NA)))) 
-     
+                                            ifelse(rate_flag == 2, "high", NA))))  %>%
+     pivot_longer(cols = 5:6, names_to = "ind", values_to = "value") %>%
+     filter(ind == input$select_ind) %>%
+     mutate(text = paste0("HSCP: ", hscp, "\n", 
+                          "Year: ", intzone, "\n",
+                          "Month: ", month(month, label = TRUE, abbr = FALSE), "\n",
+                          "Value: ",format(round_half_up(value,1), big.mark = ",")))
+   
   })
   
   
-  output$heatchart_pois <- renderPlot(
-    height = function () 800+10*length(unique(heatchart_dat()$intzone)),
+  output$heatchart_pois <- renderPlotly(
+  #  height = function () 800+10*length(unique(heatchart_dat()$intzone)),
     
     
     {
       
       
-      ggplot(heatchart_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
-                                     intzone, fill= rate_flag)) + 
+      ggplotly(ggplot(heatchart_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
+                                     intzone, fill= rate_flag_name)) + 
         scale_y_discrete(limits = unique(rev(heatchart_dat()$intzone))) + # reverses y axis - alphabetical from top
-        geom_tile(aes(fill = rate_flag, opacity = 0.75)) +
-        geom_text(aes(label = format(round_half_up(rate,digits = 0), nsmall = 0)), size=4.5) +
+        geom_tile(aes(fill = rate_flag_name)) +
+        geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4.5) +
         labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
                           names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
              x="Month", y="") + 
         scale_x_discrete(position = "top") +
         # Can choose different colour scales if required
         #scale_fill_viridis_c(option = "C") +
-        scale_fill_continuous(low = "blue",
-                              high = "orange") +
+        scale_fill_manual(values = c("#FF9100","#3586FF", "gray"), guide = guide_legend(reverse = TRUE)) +
         theme_grey(base_size = 16) + 
         labs(fill = "Rate per\n1,000 population") +
         theme(legend.position = "none",
-              plot.title = element_text(family="helvetica", face = "bold"))
-      
+              plot.title = element_text(family="helvetica", face = "bold")), tooltip = c("text")) %>%
+    config(displayModeBar = FALSE) %>% 
+        layout(height = 800+10*length(unique(heatchart_dat()$intzone)))
     })
   
   
@@ -233,7 +239,7 @@ shinyServer(function(input, output, session) {
     {
     
 
-    ggplot(selected_IZ_data(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
+   ggplot(selected_IZ_data(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
                                    intzone, fill= tile_rank, text=text)) + 
                 scale_y_discrete(limits = unique(rev(selected_IZ_data()$intzone))) + # reverses y axis - alphabetical from top
                 geom_tile(aes(fill = tile_rank)) +
@@ -250,6 +256,7 @@ shinyServer(function(input, output, session) {
                 labs(fill = "Rate per\n1,000 population") +
                 theme(legend.position = "none",
                       plot.title = element_text(family="helvetica", face = "bold"))
+        
     
   })
   

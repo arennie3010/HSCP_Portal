@@ -111,7 +111,7 @@ shinyUI(
                          tabPanel("Map",
                                   leafletOutput("map_pois", height = "80vh")), #### changeleaflet output to "map_iz" to revert to old map - in testing at the moment
                          tabPanel("Heatchart",
-                                  plotOutput("heatchart_pois", height = 800)
+                                  plotlyOutput("heatchart_pois", height = 900)
                                   # tags$div("Loading...", id = "loadmessage"),
                                   # tags$script(
                                   #   HTML(
