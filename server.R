@@ -124,14 +124,15 @@ shinyServer(function(input, output, session) {
       rename(area_name = intzone) %>%
       left_join(distinct(select(iz_bounds@data, area_name, code)), by = "area_name") %>%
       left_join(int_pops, by = "code")  %>%
-      mutate(text = paste0("InterZone Code: ", code, " <br/>", 
+      mutate(text = paste0(
+        #"InterZone Code: ", code, " <br/>", 
                            "InterZone Name: ", area_name, "<br/>", 
-                           "InterZone Population:",format(pop, big.mark = ","), "<br/>",
+                           #"InterZone Population:",format(pop, big.mark = ","), "<br/>",
                            "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE)," to ", 
                            month(input$timeframe[2], label = TRUE, abbr = FALSE), "</i><br/>",
-                           "Intermediate Zone rate: ", round(rate,0), " per 1,000 population", "<br/>",
+                           "InterZone rate: ", round(rate,0), " per 1,000 population", "<br/>",
                             100*(1-alpha), "%", " Confidence Interval: ", round(rlow,0), " to ",  round(rup,0), "<br/>",
-                           "IZ rate compared to HSCP rate: ", rate_flag_name, "<br/>",
+                        #   "InterZone rate compared to HSCP rate: ", rate_flag_name, "<br/>",
                            "HSCP rate (Comparator): ",round(crude_hscp,0)))
     
     
@@ -140,6 +141,32 @@ shinyServer(function(input, output, session) {
   })
   
 
+  tag.map.text <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 65%;
+    text-align: left;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 12px;
+  }
+"))
+  
+  
+  guidance <- tags$div(
+    tag.map.text, HTML(paste("Explore the map using your mouse. Click on an area to view information concerning the number of cases and rate of cases per 1,000
+popultation. The colours represent the IZ rate of cases compared to the overall HSCP rate:<br/>
+                             blue = IZ rate is significantly lower than the HSCP rate<br/>
+                             orange = IZ rate is significantly higher than the HSCP rate<br/>
+                             grey = IZ is neither significantly higher or lower than the HSCP rate"))
+  ) 
+  
+  
+  
+  
   ## MAP
   output$map_pois <- renderLeaflet(
     {
@@ -150,6 +177,7 @@ shinyServer(function(input, output, session) {
       
       
       leaflet() %>% 
+        addControl(guidance, position="topright", className = "map-title")%>%
         addProviderTiles(providers$CartoDB.Positron) %>%
         addPolygons(data=map_dat(),
                     color = "#444444", weight = 2, smoothFactor = 0.5,
@@ -157,7 +185,7 @@ shinyServer(function(input, output, session) {
                     label = lapply(map_dat()$text, htmltools::HTML),
                     opacity = 1.0, fillOpacity = 0.75, fillColor = ~pal(map_dat()$rate_flag), #Colours
                     highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                        bringToFront = TRUE))
+                                                        bringToFront = TRUE)) 
       
     })
   
@@ -201,20 +229,21 @@ shinyServer(function(input, output, session) {
   })
   
   
-  output$heatchart_pois <- renderPlotly(
-  #  height = function () 800+10*length(unique(heatchart_dat()$intzone)),
+  output$heatchart_pois <- renderPlot(
+    height = function () 800+10*length(unique(heatchart_dat()$intzone)),
     
     
     {
       
       
-      ggplotly(ggplot(heatchart_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
+     # ggplotly(
+        ggplot(heatchart_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
                                      intzone, fill= rate_flag_name)) + 
         scale_y_discrete(limits = unique(rev(heatchart_dat()$intzone))) + # reverses y axis - alphabetical from top
         geom_tile(aes(fill = rate_flag_name)) +
         geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4.5) +
         labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
-                          names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
+                          names(which(source_list == input$select_service)), " (", names(which(measure_list == input$select_ind)),")"), 
              x="Month", y="") + 
         scale_x_discrete(position = "top") +
         # Can choose different colour scales if required
@@ -223,9 +252,11 @@ shinyServer(function(input, output, session) {
         theme_grey(base_size = 16) + 
         labs(fill = "Rate per\n1,000 population") +
         theme(legend.position = "none",
-              plot.title = element_text(family="helvetica", face = "bold")), tooltip = c("text")) %>%
-    config(displayModeBar = FALSE) %>% 
-        layout(height = 800+10*length(unique(heatchart_dat()$intzone)))
+              plot.title = element_text(family="helvetica", face = "bold")) 
+      
+        #, tooltip = c("text")) %>%
+   # config(displayModeBar = FALSE) %>% 
+   #     layout(height = 800+10*length(unique(heatchart_dat()$intzone)))
     })
   
   
