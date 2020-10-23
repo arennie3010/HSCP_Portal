@@ -250,8 +250,8 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
         #scale_fill_viridis_c(option = "C") +
         scale_fill_manual(values = c("#FF9100","#3586FF", "gray"), guide = guide_legend(reverse = TRUE)) +
         theme_grey(base_size = 16) + 
-        labs(fill = "Rate per\n1,000 population") +
-        theme(legend.position = "none",
+        labs(fill = "IZ rate vs HSCP rate (Comparator)") +
+        theme(legend.position = "top",
               plot.title = element_text(family="helvetica", face = "bold")) 
       
         #, tooltip = c("text")) %>%
