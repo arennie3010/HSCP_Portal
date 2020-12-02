@@ -79,7 +79,7 @@ hscp.m$year <- as.factor(hscp.m$year)
 pois_dt <- readRDS("data/pois_dt.rds")
 
 r.m = 1000
-alpha = 0.02
+alpha = 0.002
 
 
 
