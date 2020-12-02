@@ -130,6 +130,50 @@ shinyUI(
   
   ))
   ),
+  
+  # Annual change tab
+  
+  
+  tabPanel("Annual Change",
+           fluidPage(
+             sidebarPanel(
+               selectInput("selectHSCP", "Select HSCP", choices = unique(iz.m$hscp), selected = "Glasgow City"),
+               hr(),
+               selectInput("select_service", label = "Service", choices = source_list,
+                           selected = "NHS24"),
+               radioButtons("select_ind", "Measure",  choices = measure_list, selected = "cases"),
+               sliderInput("timeframe", "Month",
+                           min = 3,
+                           max = 7,
+                           value = c(3,7),
+                           #min = as.Date(start_date,"%Y-%m-%d"),
+                           #max = as.Date(end_date,"%Y-%m-%d"),
+                           #value=c(as.Date(start_date,"%Y-%m-%d"),
+                           #         as.Date(end_date,"%Y-%m-%d")),
+                           #timeFormat="%Y-%m-%d",
+                           ticks = TRUE, step = 1,
+                           dragRange = TRUE),
+               measure_tooltip_d,
+               loc_tooltip_d,
+               service_tooltip_d,
+               time_tooltip_d
+             ),
+             
+  
+             mainPanel(
+               tabsetPanel(type = "tabs",
+                           tabPanel("Map",
+                                    leafletOutput("map_iz", height = "80vh")), #### changeleaflet output to "map_iz" to revert to old map - in testing at the moment
+                           tabPanel("Heatchart",
+                                    plotOutput("heatchart_iz", height = 900)
+                  
+                           ))
+               
+             ))
+  ),
+  
+  
+  
   tabPanel("Create Report",
            inputPanel(
              selectInput("selectHSCPrmd", "Select HSCP", choices = unique(iz.m$hscp), selected = "Glasgow City"),

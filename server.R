@@ -35,13 +35,34 @@ shinyServer(function(input, output, session) {
     
   })
   
-  map_dat <- reactive({
-    merge_dat <- selected_IZ_data() %>% 
-      group_by(intzone) %>%
-      summarise(value = mean(value)) %>%
+  selected_IZ_data_test <- reactive({
+    
+    iz.m %>%
+      filter(hscp == input$selectHSCP,
+             source == input$select_service,
+             month %in% input$timeframe[1]:input$timeframe[2],
+             ind == "cases") %>%
+      group_by(year,intzone) %>%
+      summarise(value = sum(value)) %>%
       ungroup() %>%
+      pivot_wider(names_from = year, values_from = value) %>%
+      mutate(c_change = round(100*((`2020`-`2019`)/`2019`),1)) %>%
+      # create percentiles for heatchart fill
+      mutate(tile_rank = ifelse(c_change > 10, 2, 
+                                ifelse(c_change > -10, 1, 0))) %>%
+      mutate(text = paste0("Interzone: ", intzone, "\n", 
+                           "Annual Change: ",round_half_up(c_change,1)))
+    
+  })
+  
+  
+  map_dat <- reactive({
+    merge_dat <- selected_IZ_data_test() %>% 
+     # group_by(intzone) %>%
+    #  summarise(value = mean(value)) %>%
+     # ungroup() %>%
       # Create percentiles for the colours being used
-      mutate(tile_rank = ntile(value,10)) %>%
+    #  mutate(tile_rank = ntile(value,10)) %>%
       rename(area_name = intzone) %>%
       left_join(distinct(select(iz_bounds@data, area_name, code)), by = "area_name") %>%
       left_join(int_pops, by = "code") %>%
@@ -55,7 +76,7 @@ shinyServer(function(input, output, session) {
                            "<i>(MB:", input$timeframe[1], "- MB:",
                            input$timeframe[2], ")</i><br/>",
                            #
-                           "Monthly average ", input$select_ind,": ", round_half_up(value,1)))
+                           "Annual change: ", round_half_up(c_change,1)))
     
     sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
           merge_dat, by = c("area_name", "code"))
@@ -65,13 +86,11 @@ shinyServer(function(input, output, session) {
   output$map_iz <- renderLeaflet(
     {
       
-    pal <- colorNumeric(
-      palette = colorRampPalette(c("#FFFFB7","#FF9100","red"), bias = 2.5)(length(map_dat()$area_name)), 
-      domain = c(min(map_dat()$value):max(map_dat()$value + 1)))
+      pal1 <- colorNumeric(
+        palette = colorRampPalette(c("blue","grey","orange"))(3), 
+        domain = c(0:2))
     
-    legend_title <- paste(case_when(input$select_ind == "cases" ~ "Monthly average cases",
-                                    input$select_ind == "rate" ~ "Monthly average rate <br>(per 1,000 population)",
-                                    input$select_ind == "change" ~ "Percent annual change"))
+    legend_title <- paste(case_when(input$select_ind == "change" ~ "Percent annual change"))
 
     
     leaflet() %>% 
@@ -80,12 +99,21 @@ shinyServer(function(input, output, session) {
                   color = "#444444", weight = 2, smoothFactor = 0.5,
                   #tooltip
                   label = lapply(map_dat()$text, htmltools::HTML),
-                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(map_dat()$value), #Colours
+                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal1(map_dat()$tile_rank), #Colours
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)) %>%
-                  addLegend(pal = pal, values = map_dat()$value, title = HTML(legend_title))
+      addLegend("topright", pal = pal1, values = 0:2, 
+                title = "Annual change category",
+                opacity = 1)
       
   })
+  
+  #################### annual change data ####################################
+  
+  
+  
+  
+  
   
   ################## poisson test  ###################################
   
@@ -118,7 +146,7 @@ shinyServer(function(input, output, session) {
   
   
   
-  map_dat <- reactive({
+  map_dat_pois <- reactive({
    test_1 <- selected_IZ_data_pois() %>% 
       # pivot_longer(cols = 3:5, names_to = "ind", values_to = "value") %>%
       rename(area_name = intzone) %>%
@@ -179,11 +207,11 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
       leaflet() %>% 
         addControl(guidance, position="topright", className = "map-title")%>%
         addProviderTiles(providers$CartoDB.Positron) %>%
-        addPolygons(data=map_dat(),
+        addPolygons(data=map_dat_pois(),
                     color = "#444444", weight = 2, smoothFactor = 0.5,
                     #tooltip
-                    label = lapply(map_dat()$text, htmltools::HTML),
-                    opacity = 1.0, fillOpacity = 0.75, fillColor = ~pal(map_dat()$rate_flag), #Colours
+                    label = lapply(map_dat_pois()$text, htmltools::HTML),
+                    opacity = 1.0, fillOpacity = 0.75, fillColor = ~pal(map_dat_pois()$rate_flag), #Colours
                     highlightOptions = highlightOptions(color = "white", weight = 2,
                                                         bringToFront = TRUE)) 
       

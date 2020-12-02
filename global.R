@@ -46,7 +46,8 @@ source_list <- list("A&E Cases" = "A&E",
 
 measure_list <- list("Total cases" = "cases",
                      "Rate (per 1,000 population)" = "rate",
-                     "Annual change (%)" = "change")
+                     "Annual Change" = "change")
+# Create Measure list for annual change tab
 
 ##########    Generic data files which include app date limits, location lookups and population lookups ##########
 
