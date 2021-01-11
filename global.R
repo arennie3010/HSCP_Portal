@@ -43,10 +43,14 @@ source_list <- list("A&E Cases" = "A&E",
                               "NHS24 Records" = "NHS24",
                               "GP OOH Cases" = "OOH",
                               "Scottish Ambulance Service Records" = "SAS")
-
+# For use on summary
 measure_list <- list("Total cases" = "cases",
                      "Rate (per 1,000 population)" = "rate",
                      "Annual Change" = "change")
+# for use on explorer tabs
+measure_list_2 <- list("Total cases" = "cases",
+                     "Rate (per 1,000 population)" = "rate")
+
 # Create Measure list for annual change tab
 
 ##########    Generic data files which include app date limits, location lookups and population lookups ##########
@@ -81,6 +85,10 @@ pois_dt <- readRDS("data/pois_dt.rds")
 
 r.m = 1000
 alpha = 0.002
+
+##################### Annual Change tab #####################################
+
+colour_cat <- 10
 
 
 
@@ -157,7 +165,7 @@ alpha = 0.002
 measure_tooltip_s <- bsTooltip("select_indsummary", "Total cases: Number of cases per month<br/>
                                Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
                              "right", options = list(container = "body"))
-time_tooltip_s <- bsTooltip("timeframesummary", "March to July", options = list(container = "body"))
+time_tooltip_s <- bsTooltip("timeframesummary", "January to December", options = list(container = "body"))
 
 loc_tooltip_s <- bsTooltip("selectHSCPsummary", "Select Health and Social Care Partnership", options = list(container = "body"))
 
@@ -165,7 +173,7 @@ loc_tooltip_s <- bsTooltip("selectHSCPsummary", "Select Health and Social Care P
 
 measure_tooltip_d <- bsTooltip("select_ind", "Total cases: Number of cases per month<br/> Rate: Rate of cases per 1,000 population<br/>Annual change (%): % change from the previous year",
                              "right", options = list(container = "body"))
-time_tooltip_d <- bsTooltip("timeframe", "Months March to July.<br/> To see monthly transitions, move slider to one month period.", options = list(container = "body"))
+time_tooltip_d <- bsTooltip("timeframe", "Months January to December.<br/> To see monthly transitions, move slider to one month period.", options = list(container = "body"))
 
 loc_tooltip_d <- bsTooltip("selectHSCP", "Select Health and Social Care Partnership", options = list(container = "body"))
 

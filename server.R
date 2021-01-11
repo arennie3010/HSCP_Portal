@@ -19,42 +19,32 @@ shinyServer(function(input, output, session) {
   #   
   # })
   
-  selected_IZ_data <- reactive({
-    
-    iz.m %>%
-      filter(hscp == input$selectHSCP,
-             source == input$select_service,
-             year == 2020,
-             month %in% input$timeframe[1]:input$timeframe[2],
-             ind == input$select_ind) %>%
-      # create percentiles for heatchart fill
-      mutate(tile_rank = ntile(value,20)) %>%
-      mutate(text = paste0("Interzone: ", intzone, "\n", 
-                           "Month: ", month(month, label = TRUE, abbr = FALSE), "\n", 
-                           "Rate: ",round_half_up(value,1)))
-    
-  })
-  
+ 
+  ########## Annual change data  ###############################################
   selected_IZ_data_test <- reactive({
     
     iz.m %>%
-      filter(hscp == input$selectHSCP,
-             source == input$select_service,
-             month %in% input$timeframe[1]:input$timeframe[2],
-             ind == "cases") %>%
+      filter(ind == "cases") %>%
+      filter(hscp == input$selectHSCP_1,
+             source == input$select_service_1,
+             month %in% input$timeframe_1[1]:input$timeframe_1[2]) %>%
       group_by(year,intzone) %>%
       summarise(value = sum(value)) %>%
       ungroup() %>%
       pivot_wider(names_from = year, values_from = value) %>%
       mutate(c_change = round(100*((`2020`-`2019`)/`2019`),1)) %>%
       # create percentiles for heatchart fill
-      mutate(tile_rank = ifelse(c_change > 10, 2, 
-                                ifelse(c_change > -10, 1, 0))) %>%
+      mutate(tile_rank = ifelse(c_change > colour_cat, 2, 
+                                ifelse(c_change > -colour_cat, 1, 0))) %>%
+     # mutate(rate_flag_name = ifelse(tile_rank == 0, "lower",  # 2 = high, 0 = low, 1 = same
+    #                                 ifelse(tile_rank == 1, "same",
+    #                                        ifelse(tile_rank == 2, "higher", NA)))) %>%
       mutate(text = paste0("Interzone: ", intzone, "\n", 
                            "Annual Change: ",round_half_up(c_change,1)))
     
   })
   
+############ Annual Change Map ####################################################
   
   map_dat <- reactive({
     merge_dat <- selected_IZ_data_test() %>% 
@@ -70,17 +60,43 @@ shinyServer(function(input, output, session) {
       mutate(text = paste0("InterZone Code: ", code, " <br/>", 
                            "InterZone Name: ", area_name, "<br/>", 
                            "InterZone Population:",format(pop, big.mark = ","), "<br/>",
-                           "Months: ", month(input$timeframe[1], label = TRUE, abbr = FALSE), 
+                           "Months: ", month(input$timeframe_1[1], label = TRUE, abbr = FALSE), 
                            " to ", 
-                           month(input$timeframe[2], label = TRUE, abbr = FALSE), " ", 
-                           "<i>(MB:", input$timeframe[1], "- MB:",
-                           input$timeframe[2], ")</i><br/>",
+                           month(input$timeframe_1[2], label = TRUE, abbr = FALSE), " ", 
+                           "<i>(MB:", input$timeframe_1[1], "- MB:",
+                           input$timeframe_1[2], ")</i><br/>",
                            #
-                           "Annual change: ", round_half_up(c_change,1)))
+                           "Annual change: ", round_half_up(c_change,1),"%"))
     
-    sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP,], 
+    sp::merge(iz_bounds[iz_bounds$council == input$selectHSCP_1,], 
           merge_dat, by = c("area_name", "code"))
   })
+  
+  
+  tag.map.text <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 65%;
+    text-align: left;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 12px;
+  }
+"))
+  
+  
+  guidance_1 <- tags$div(
+    tag.map.text, HTML(paste("Explore the map using your mouse. Click on an area to view information concerning the annual change in the number of cases for the chosen service and area.
+The colours categorise the type of change in the service usage for the selected service and time period:<br/>
+                             blue = A decrease of more than 10% from the previous year<br/>
+                             orange = An increase of more than 10% from the previous year<br/>
+                             grey = Increase or decrease less than 10% either way"))
+  ) 
+  
+  
   
   ## MAP
   output$map_iz <- renderLeaflet(
@@ -90,10 +106,11 @@ shinyServer(function(input, output, session) {
         palette = colorRampPalette(c("blue","grey","orange"))(3), 
         domain = c(0:2))
     
-    legend_title <- paste(case_when(input$select_ind == "change" ~ "Percent annual change"))
+    legend_title <- paste(case_when(input$select_ind_1 == "change" ~ "Percent annual change"))
 
     
     leaflet() %>% 
+      addControl(guidance_1, position="topright", className = "map-title")%>%
       addProviderTiles(providers$CartoDB.Positron) %>%
       addPolygons(data=map_dat(),
                   color = "#444444", weight = 2, smoothFactor = 0.5,
@@ -101,14 +118,79 @@ shinyServer(function(input, output, session) {
                   label = lapply(map_dat()$text, htmltools::HTML),
                   opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal1(map_dat()$tile_rank), #Colours
                   highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                      bringToFront = TRUE)) %>%
-      addLegend("topright", pal = pal1, values = 0:2, 
-                title = "Annual change category",
-                opacity = 1)
+                                                      bringToFront = TRUE)) #%>%
+     # addLegend("topright", pal = pal1, values = 0:2, 
+    #            title = "Annual change category",
+    #            opacity = 1)
       
   })
   
-  #################### annual change data ####################################
+  ############ annual change heatchart data ######################
+  
+  heatchart_data_change <- reactive({
+    
+    iz.m %>%
+      filter(ind == "cases") %>%
+      filter(hscp == input$selectHSCP_1,
+             source == input$select_service_1,
+             month %in% input$timeframe_1[1]:input$timeframe_1[2]) %>%
+      group_by(year, month, intzone) %>%
+      summarise(value = sum(value)) %>%
+      ungroup() %>%
+      pivot_wider(names_from = year, values_from = value) %>%
+      mutate(c_change = round(100*((`2020`-`2019`)/`2019`),1)) %>%
+      # create percentiles for heatchart fill
+      mutate(tile_rank = ifelse(c_change > colour_cat, 2, 
+                                ifelse(c_change > -colour_cat, 1, 0))) %>%
+      # mutate(rate_flag_name = ifelse(tile_rank == 0, "lower",  # 2 = high, 0 = low, 1 = same
+      #                                 ifelse(tile_rank == 1, "same",
+      #                                        ifelse(tile_rank == 2, "higher", NA)))) %>%
+      mutate(text = paste0("Interzone: ", intzone, "\n", 
+                           "Annual Change: ",round_half_up(c_change,1)))
+    
+  })
+  
+  
+  
+  
+  
+  ##################### Annual change  HEATCHART #########################################
+  output$heatchart_iz <- renderPlot(
+    height = function () 800+10*length(unique(heatchart_data_change()$intzone)),
+    
+    
+    {
+      
+      
+      ggplot(heatchart_data_change(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
+                                     intzone, 
+                                     #fill= tile_rank, 
+                                     text=text)) + 
+        scale_y_discrete(limits = unique(rev(heatchart_data_change()$intzone))) + # reverses y axis - alphabetical from top
+        geom_tile(aes(fill = tile_rank)) +
+        geom_text(aes(label = format(round_half_up(c_change,digits = 0), nsmall = 0)), size=4.5) +
+        labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
+                          names(which(source_list == input$select_service_1)), " Cases (", input$select_service_1, ")"), 
+             x="Month", y="") + 
+        scale_x_discrete(position = "top") +
+        # Can choose different colour scales if required
+        #scale_fill_viridis_c(option = "C") +
+       # scale_fill_continuous(low = "#FFFFB7",
+      #                        high = "red") +
+        scale_fill_manual(values = c("#FF9100","#3586FF", "gray"), guide = guide_legend(reverse = TRUE)) +
+        theme_grey(base_size = 16) + 
+        labs(fill = "% Change from Previous Year") +
+        theme(legend.position = "none",
+              plot.title = element_text(family="helvetica", face = "bold"))
+      
+      
+    })
+  
+
+  
+  
+  
+  #################### annual change data end####################################
   
   
   
@@ -141,7 +223,8 @@ shinyServer(function(input, output, session) {
       select(hscp, intzone, rate_flag, cases, rate, rlow, rup, crude_hscp) %>%
       mutate(rate_flag_name = ifelse(rate_flag == 0, "low",  # 2 = high, 0 = low, 1 = same
                                      ifelse(rate_flag == 1, "same",
-                                            ifelse(rate_flag == 2, "high", NA))))
+                                            ifelse(rate_flag == 2, "high", NA)))
+      )
   })
   
   
@@ -169,20 +252,7 @@ shinyServer(function(input, output, session) {
   })
   
 
-  tag.map.text <- tags$style(HTML("
-  .leaflet-control.map-title { 
-    transform: translate(-50%,20%);
-    position: fixed !important;
-    left: 65%;
-    text-align: left;
-    padding-left: 10px; 
-    padding-right: 10px; 
-    background: rgba(255,255,255,0.75);
-    font-weight: bold;
-    font-size: 12px;
-  }
-"))
-  
+
   
   guidance <- tags$div(
     tag.map.text, HTML(paste("Explore the map using your mouse. Click on an area to view information concerning the number of cases and rate of cases per 1,000
@@ -222,7 +292,7 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
   ###################################################################
   ###       HEATCHART WITH DIFFERENT COLOURS                     ###
   
- heatchart_dat <- reactive({
+ heatchart_pois_dat <- reactive({
     
     pois_dt %>%
       filter(hscp == input$selectHSCP,
@@ -258,16 +328,16 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
   
   
   output$heatchart_pois <- renderPlot(
-    height = function () 800+10*length(unique(heatchart_dat()$intzone)),
+    height = function () 800+10*length(unique(heatchart_pois_dat()$intzone)),
     
     
     {
       
       
      # ggplotly(
-        ggplot(heatchart_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
+        ggplot(heatchart_pois_dat(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
                                      intzone, fill= rate_flag_name)) + 
-        scale_y_discrete(limits = unique(rev(heatchart_dat()$intzone))) + # reverses y axis - alphabetical from top
+        scale_y_discrete(limits = unique(rev(heatchart_pois_dat()$intzone))) + # reverses y axis - alphabetical from top
         geom_tile(aes(fill = rate_flag_name)) +
         geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4.5) +
         labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
@@ -288,47 +358,22 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
     })
   
   
-  ################################
-  
-  ## HEATCHART
-  output$heatchart_iz <- renderPlot(
-    height = function () 800+10*length(unique(selected_IZ_data()$intzone)),
-
-    
-    {
-    
-
-   ggplot(selected_IZ_data(), aes(factor(month, levels = input$timeframe[1]:input$timeframe[2]), 
-                                   intzone, fill= tile_rank, text=text)) + 
-                scale_y_discrete(limits = unique(rev(selected_IZ_data()$intzone))) + # reverses y axis - alphabetical from top
-                geom_tile(aes(fill = tile_rank)) +
-                geom_text(aes(label = format(round_half_up(value,digits = 0), nsmall = 0)), size=4.5) +
-                labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
-                                  names(which(source_list == input$select_service)), " Cases (", input$select_service, ")"), 
-                     x="Month", y="") + 
-        scale_x_discrete(position = "top") +
-        # Can choose different colour scales if required
-                #scale_fill_viridis_c(option = "C") +
-                scale_fill_continuous(low = "#FFFFB7",
-                                      high = "red") +
-                theme_grey(base_size = 16) + 
-                labs(fill = "Rate per\n1,000 population") +
-                theme(legend.position = "none",
-                      plot.title = element_text(family="helvetica", face = "bold"))
-        
-    
-  })
   
   ## DATATABLE
   output$datatable_iz <- renderDataTable({
-    selected_IZ_data() %>% 
-      mutate(value = round_half_up(value,2)) %>%
+    selected_IZ_data_pois() %>% 
+      mutate(value = round_half_up(rate,2)) %>%
       
       select(M = month, `Month` = intzone, 
-                  `Rate (per 1,000 population)`=value) %>%
+             `Rate (per 1,000 population)`=rate) %>%
       spread(M, `Rate (per 1,000 population)`) %>%
       datatable(rownames = FALSE)
   })
+  
+  
+  
+  ################################
+  
   
 
 
