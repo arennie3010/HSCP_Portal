@@ -377,7 +377,7 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
   
 
 
-#### SUMMARY 
+################################ SUMMARY ##############################################################
 
   selected_summary_data <- reactive({
     
@@ -392,10 +392,7 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
     
   })
   
-  selected_text <- reactive({
-    
-    
-  })
+
  
 info_data <- reactive({
   hscp.m %>%
@@ -431,8 +428,24 @@ output$sc1 <- renderPlotly({
  
 })
 
-output$text1 <- renderText({paste0("This chart shows the change in GP out of hours service usage from month beginning ", input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
-                                  "\n",  "There has been an *increase/decrease* in ", input$select_indsummary, " for GP OOH cases in ", input$selectHSCPsummary)})
+selectedtextdata1 <- reactive({selected_summary_data() %>%
+                                      filter(source == "OOH",
+                                      year == "2020",
+                                      month == input$timeframesummary[1] | month == input$timeframesummary[2], 
+                                      hscp == input$selectHSCPsummary, 
+                                      ind == input$select_indsummary) #%>%
+   # summarise(value = format(round(mean(value),0),big.mark=",")) 
+  })
+
+#output$textdata1 <- renderPrint({selectedtextdata1()})
+
+output$text1 <- renderText({paste0("This chart shows the change in GP Out Of Hours service usage in ", input$selectHSCPsummary , " from Month ", 
+                                   input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
+                                  "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
+                                               ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                  as.character(selectedtextdata1() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
+                                  as.character(selectedtextdata1() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                  input$timeframesummary[1], " and ", input$timeframesummary[2])})
 
 output$sc2 <- renderPlotly({
   
@@ -446,7 +459,23 @@ output$sc2 <- renderPlotly({
     config(displayModeBar = FALSE)
 })
 
-output$text2 <- renderText({"Chart commentary for A&E chart which will be automated via RMarkdown."})
+selectedtextdata2 <- reactive({selected_summary_data() %>%
+    filter(source == "A&E",
+           year == "2020",
+           month == input$timeframesummary[1] | month == input$timeframesummary[2], 
+           hscp == input$selectHSCPsummary, 
+           ind == input$select_indsummary) 
+})
+
+
+output$text2 <- renderText({paste0("This chart shows the change in Accident & Emergency service usage in ", input$selectHSCPsummary , " from Month ", 
+                                   input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
+                                   "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
+                                                ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                   as.character(selectedtextdata2() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
+                                   as.character(selectedtextdata2() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                   input$timeframesummary[1], " and ", input$timeframesummary[2])})
+
 
 output$sc3 <- renderPlotly({
   
@@ -459,7 +488,24 @@ output$sc3 <- renderPlotly({
          caption = "Data source: Unscheduled Care database", x = "Month", y = paste(input$select_indsummary)), tooltip = c("text")) %>%
     config(displayModeBar = FALSE)
 })
-  output$text3 <- renderText({"Chart commentary for NHS24 chart which will be automated via RMarkdown."})
+
+selectedtextdata3 <- reactive({selected_summary_data() %>%
+    filter(source == "NHS24",
+           year == "2020",
+           month == input$timeframesummary[1] | month == input$timeframesummary[2], 
+           hscp == input$selectHSCPsummary, 
+           ind == input$select_indsummary) 
+})
+
+
+output$text3 <- renderText({paste0("This chart shows the change in NHS24 service usage in ", input$selectHSCPsummary , " from Month ", 
+                                   input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
+                                   "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
+                                                ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                   as.character(selectedtextdata3() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
+                                   as.character(selectedtextdata3() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                   input$timeframesummary[1], " and ", input$timeframesummary[2])})
+
   
   output$sc4 <- renderPlotly({
     
@@ -473,7 +519,22 @@ output$sc3 <- renderPlotly({
       config(displayModeBar = FALSE)
   })
   
-  output$text4 <- renderText({"Chart commentary for SAS chart which will be automated via RMarkdown."})
+  selectedtextdata4 <- reactive({selected_summary_data() %>%
+      filter(source == "SAS",
+             year == "2020",
+             month == input$timeframesummary[1] | month == input$timeframesummary[2], 
+             hscp == input$selectHSCPsummary, 
+             ind == input$select_indsummary) 
+  })
+  
+  
+  output$text4 <- renderText({paste0("This chart shows the change in Scottish Ambulance Service usage in ", input$selectHSCPsummary , " from Month ", 
+                                     input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
+                                     "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
+                                                  ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                     as.character(selectedtextdata4() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
+                                     as.character(selectedtextdata4() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                     input$timeframesummary[1], " and ", input$timeframesummary[2])})
   
   
   output$sc5 <- renderPlotly({
@@ -488,7 +549,23 @@ output$sc3 <- renderPlotly({
       config(displayModeBar = FALSE)
   })
   
-  output$text5 <- renderText({"Chart commentary for Emergency Admissions chart which will be automated via RMarkdown."})
+  selectedtextdata5 <- reactive({selected_summary_data() %>%
+      filter(source == "EA",
+             year == "2020",
+             month == input$timeframesummary[1] | month == input$timeframesummary[2], 
+             hscp == input$selectHSCPsummary, 
+             ind == input$select_indsummary) 
+  })
+  
+  
+  output$text5 <- renderText({paste0("This chart shows the change in Emergency Admissions in ", input$selectHSCPsummary , " from Month ", 
+                                     input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
+                                     "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
+                                                  ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                     as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
+                                     as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                     input$timeframesummary[1], " and ", input$timeframesummary[2])})
+  
 
 
 
