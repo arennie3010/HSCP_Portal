@@ -1,41 +1,32 @@
-# Description - Describe what the app does (e.g. visualizes births data)
+# Description - This app displays usage of Unscheduled care services and both HSCP level and Intermeidate Zone level.
+# Figures have been aggregated to show monthly cases, rates as well as annual change from the same month the previous year
 # This is the server script, it produces the outputs and reactive objects
 # of the app: charts, text,
 
-# test
 
-#nhs24 <- read.csv(gzfile("data/nhs24.csv.gz"))
-# iz <- read.csv("data/2020_data/UCdata--iz.csv")
-# hscp <- read.csv("data/2020_data/UCdata--hscp.csv")
+
+# start of function
 
 shinyServer(function(input, output, session) {
   
+# Annual change data calculates rates/changes by comparing current monthly figures to the same period the previous year (e.g. comparing service usage in July 2020 to July 2019) 
   
-  # selectedDada <- reactive({
-  #   d<-nhs24 %>%
-  #     filter(case_type == input$select_ind) %>%
-  #     filter(ind == input$select_ind)
-  #   
-  #   
-  # })
-  
- 
-  ########## Annual change data  ###############################################
+########## Annual change data  ###############################################
   selected_IZ_data_test <- reactive({
-    
+    # iz.m = monthly IZ level data set from data build file whihc is loaded in the global.R script
     iz.m %>%
-      filter(ind == "cases") %>%
-      filter(hscp == input$selectHSCP_1,
+      filter(ind == "cases") %>% # removes any static rates rows from data
+      filter(hscp == input$selectHSCP_1, # to calculate drop down menu choices
              source == input$select_service_1,
              month %in% input$timeframe_1[1]:input$timeframe_1[2]) %>%
-      group_by(year,intzone) %>%
+      group_by(year,intzone) %>%  
       summarise(value = sum(value)) %>%
       ungroup() %>%
       pivot_wider(names_from = year, values_from = value) %>%
-      mutate(c_change = round(100*((`2020`-`2019`)/`2019`),1)) %>%
+      mutate(c_change = round(100*((`2020`-`2019`)/`2019`),1)) %>% # % change from the year before 
       # create percentiles for heatchart fill
       mutate(tile_rank = ifelse(c_change > colour_cat, 2, 
-                                ifelse(c_change > -colour_cat, 1, 0))) %>%
+                                ifelse(c_change > -colour_cat, 1, 0))) %>% # for the blue/grey/orange colours
      # mutate(rate_flag_name = ifelse(tile_rank == 0, "lower",  # 2 = high, 0 = low, 1 = same
     #                                 ifelse(tile_rank == 1, "same",
     #                                        ifelse(tile_rank == 2, "higher", NA)))) %>%
@@ -44,8 +35,12 @@ shinyServer(function(input, output, session) {
     
   })
   
-############ Annual Change Map ####################################################
   
+  
+  
+  
+############################ Annual Change Map ####################################################
+  # data formatting for map
   map_dat <- reactive({
     merge_dat <- selected_IZ_data_test() %>% 
      # group_by(intzone) %>%
@@ -98,7 +93,7 @@ The colours categorise the type of change in the service usage for the selected 
   
   
   
-  ## MAP
+  ## MAP leaflet code
   output$map_iz <- renderLeaflet(
     {
       
@@ -142,9 +137,9 @@ The colours categorise the type of change in the service usage for the selected 
       # create percentiles for heatchart fill
       mutate(tile_rank = ifelse(c_change > colour_cat, 2, 
                                 ifelse(c_change > -colour_cat, 1, 0))) %>%
-      # mutate(rate_flag_name = ifelse(tile_rank == 0, "lower",  # 2 = high, 0 = low, 1 = same
-      #                                 ifelse(tile_rank == 1, "same",
-      #                                        ifelse(tile_rank == 2, "higher", NA)))) %>%
+       mutate(rate_flag_name = ifelse(tile_rank == 0, "lower",  # 2 = high, 0 = low, 1 = same
+                                       ifelse(tile_rank == 1, "same",
+                                              ifelse(tile_rank == 2, "higher", NA)))) %>%
       mutate(text = paste0("Interzone: ", intzone, "\n", 
                            "Annual Change: ",round_half_up(c_change,1)))
     
@@ -167,7 +162,7 @@ The colours categorise the type of change in the service usage for the selected 
                                      #fill= tile_rank, 
                                      text=text)) + 
         scale_y_discrete(limits = unique(rev(heatchart_data_change()$intzone))) + # reverses y axis - alphabetical from top
-        geom_tile(aes(fill = tile_rank)) +
+        geom_tile(aes(fill = as.factor(rate_flag_name))) +
         geom_text(aes(label = format(round_half_up(c_change,digits = 0), nsmall = 0)), size=4.5) +
         labs(title=paste0(input$selectHSCP," HSCP Intermediate Zones \n Monthly ", 
                           names(which(source_list == input$select_service_1)), " Cases (", input$select_service_1, ")"), 
@@ -175,12 +170,12 @@ The colours categorise the type of change in the service usage for the selected 
         scale_x_discrete(position = "top") +
         # Can choose different colour scales if required
         #scale_fill_viridis_c(option = "C") +
-       # scale_fill_continuous(low = "#FFFFB7",
-      #                        high = "red") +
+        #scale_fill_continuous(low = "#FFFFB7",
+        #                      high = "red") +
         scale_fill_manual(values = c("#FF9100","#3586FF", "gray"), guide = guide_legend(reverse = TRUE)) +
         theme_grey(base_size = 16) + 
         labs(fill = "% Change from Previous Year") +
-        theme(legend.position = "none",
+        theme(legend.position = "top",
               plot.title = element_text(family="helvetica", face = "bold"))
       
       
@@ -357,16 +352,15 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
    #     layout(height = 800+10*length(unique(heatchart_dat()$intzone)))
     })
   
-  
-  
+  dt_table_data <- reactive({
+    heatchart_pois_dat() %>%
+    select(intzone, month, value) %>%
+    pivot_wider(names_from = "month", values_from = "value") 
+  })
   ## DATATABLE
   output$datatable_iz <- renderDataTable({
-    selected_IZ_data_pois() %>% 
-      mutate(value = round_half_up(rate,2)) %>%
-      
-      select(M = month, `Month` = intzone, 
-             `Rate (per 1,000 population)`=rate) %>%
-      spread(M, `Rate (per 1,000 population)`) %>%
+    dt_table_data() %>%
+      #spread(M, `Rate (per 1,000 population)`) %>%
       datatable(rownames = FALSE)
   })
   
@@ -560,7 +554,8 @@ output$text3 <- renderText({paste0("This chart shows the change in NHS24 service
   
   output$text5 <- renderText({paste0("This chart shows the change in Emergency Admissions in ", input$selectHSCPsummary , " from Month ", 
                                      input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
-                                     "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
+                                     '\n','\n',
+                                     ifelse(input$select_indsummary == "cases", "The number of cases ",
                                                   ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
                                      as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
                                      as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
