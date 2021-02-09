@@ -446,9 +446,10 @@ selectedtextdata1 <- reactive({selected_summary_data() %>%
 output$text1 <- renderText({paste0("This chart shows the change in GP Out Of Hours service usage in ", input$selectHSCPsummary , " from Month ", 
                                    input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
                                   "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
-                                               ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                               ifelse(input$select_indsummary == "rate", "The rate of cases ",
+                                                      "  The percentage difference compared to the corresponding month the previous year ")),"changed from ",   
                                   as.character(selectedtextdata1() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
-                                  as.character(selectedtextdata1() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                  as.character(selectedtextdata1() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between month ",
                                   input$timeframesummary[1], " and ", input$timeframesummary[2])})
 
 output$sc2 <- renderPlotly({
@@ -475,9 +476,10 @@ selectedtextdata2 <- reactive({selected_summary_data() %>%
 output$text2 <- renderText({paste0("This chart shows the change in Accident & Emergency service usage in ", input$selectHSCPsummary , " from Month ", 
                                    input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
                                    "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
-                                                ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                                ifelse(input$select_indsummary == "rate", "The rate of cases ",
+                                                       "  The percentage difference compared to the corresponding month  the previous year ")), "changed from ",   
                                    as.character(selectedtextdata2() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
-                                   as.character(selectedtextdata2() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                   as.character(selectedtextdata2() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between month ",
                                    input$timeframesummary[1], " and ", input$timeframesummary[2])})
 
 
@@ -505,9 +507,10 @@ selectedtextdata3 <- reactive({selected_summary_data() %>%
 output$text3 <- renderText({paste0("This chart shows the change in NHS24 service usage in ", input$selectHSCPsummary , " from Month ", 
                                    input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
                                    "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
-                                                ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                                ifelse(input$select_indsummary == "rate", "The rate of cases ",
+                                                       "  The percentage difference compared to the corresponding month the previous year ")), "changed from ",   
                                    as.character(selectedtextdata3() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
-                                   as.character(selectedtextdata3() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                   as.character(selectedtextdata3() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between month ",
                                    input$timeframesummary[1], " and ", input$timeframesummary[2])})
 
   
@@ -535,9 +538,10 @@ output$text3 <- renderText({paste0("This chart shows the change in NHS24 service
   output$text4 <- renderText({paste0("This chart shows the change in Scottish Ambulance Service usage in ", input$selectHSCPsummary , " from Month ", 
                                      input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
                                      "\n", ifelse(input$select_indsummary == "cases", "The number of cases ",
-                                                  ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                                  ifelse(input$select_indsummary == "rate", "The rate of cases ",
+                                                         "  The percentage difference compared to the corresponding month the previous year ")), "changed from ",   
                                      as.character(selectedtextdata4() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
-                                     as.character(selectedtextdata4() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                     as.character(selectedtextdata4() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between month ",
                                      input$timeframesummary[1], " and ", input$timeframesummary[2])})
   
   
@@ -566,9 +570,10 @@ output$text3 <- renderText({paste0("This chart shows the change in NHS24 service
                                      input$timeframesummary[1], " to ", input$timeframesummary[2], ". ",
                                      '\n','\n',
                                      ifelse(input$select_indsummary == "cases", "The number of cases ",
-                                                  ifelse(input$select_indsummary == "rate", "The rate of cases ", "  The percentage difference compared to the previous year ")), "changed from ",   
+                                                  ifelse(input$select_indsummary == "rate", "The rate of cases ",
+                                                         "  The percentage difference compared to the corresponding month the previous year ")), "changed from ",   
                                      as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[1]) %>% select(value)), " to ",
-                                     as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between Month ",
+                                     as.character(selectedtextdata5() %>% filter(month == input$timeframesummary[2]) %>% select(value)), " between month ",
                                      input$timeframesummary[1], " and ", input$timeframesummary[2])})
   
 
