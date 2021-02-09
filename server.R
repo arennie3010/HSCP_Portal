@@ -354,14 +354,24 @@ popultation. The colours represent the IZ rate of cases compared to the overall 
   
   dt_table_data <- reactive({
     heatchart_pois_dat() %>%
-    select(intzone, month, value) %>%
+    select(hscp, intzone, month, value) %>%
     pivot_wider(names_from = "month", values_from = "value") 
   })
   ## DATATABLE
   output$datatable_iz <- renderDataTable({
     dt_table_data() %>%
       #spread(M, `Rate (per 1,000 population)`) %>%
-      datatable(rownames = FALSE)
+      datatable(extensions = 'Buttons',
+                options = list(pageLength = length(dt_table_data()$intzone),
+                                paging = TRUE,
+                               searching = TRUE,
+                               fixedColumns = TRUE,
+                               autoWidth = TRUE,
+                               ordering = TRUE,
+                               dom = 'Brt',
+                               buttons = c('copy', 'csv', 'excel')),
+                class = "display",
+                rownames = FALSE)
   })
   
   
